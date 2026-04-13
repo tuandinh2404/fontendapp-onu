@@ -12,13 +12,14 @@ composeBom = "2025.08.00"
 appcompat = "1.7.1"
 compose-constraint-layout = "1.0.1"
 hiltVersion = "2.51.1"
-kspVersion = "1.9.25-1.0.20"
+kspVersion = "2.0.21-1.0.28"
 navigationComposeAndroid = "2.9.0"
 
 kotlinxDatetime = "0.6.1"
 
 androidxComposeFoundation = "1.8.0-alpha07"
 
+coroutines = "1.9.0"
 
 
 turbine = "1.2.0"
@@ -53,10 +54,9 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
 
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coreKtx" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coreKtx" }
-kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "coreKtx" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coreKtx" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 
@@ -64,8 +64,8 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 # Optional add-on libraries
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }

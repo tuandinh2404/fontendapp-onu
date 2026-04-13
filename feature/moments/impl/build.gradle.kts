@@ -40,6 +40,7 @@ android {
 
 dependencies {
     implementation(projects.core.common)
+    implementation(projects.core.designsystem)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -48,6 +49,19 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
+
+    implementation ("androidx.camera:camera-core:1.4.2")
+    implementation ("androidx.camera:camera-camera2:1.4.2")
+    implementation ("androidx.camera:camera-lifecycle:1.4.2")
+    implementation ("androidx.camera:camera-view:1.4.2")
+    implementation ("androidx.camera:camera-video:1.4.2")
+    implementation ("androidx.camera:camera-extensions:1.4.2")
+    implementation ("jp.co.cyberagent.android:gpuimage:2.1.0")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-video:2.7.0")
+
 
     implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")

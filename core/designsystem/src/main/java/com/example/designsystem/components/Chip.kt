@@ -12,7 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.designsystem.icon.OnuIcons
 
 /**
  * Now in Android filter chip with included leading checked icon as well as text content slot.
@@ -45,7 +47,7 @@ fun FilterChip(
         leadingIcon = if (selected) {
             {
                 Icon(
-                    imageVector = NiaIcons.Check,
+                    painter = painterResource(OnuIcons.Search),
                     contentDescription = null,
                 )
             }
@@ -89,17 +91,17 @@ fun FilterChip(
     )
 }
 
-@ThemePreviews
-@Composable
-fun ChipPreview() {
-     MaterialTheme{
-        Surface(modifier = Modifier.size(80.dp, 20.dp)) {
-            FilterChip(selected = true, onSelectedChange = {}) {
-                Text("Chip")
-            }
-        }
-    }
-}
+//@ThemePreviews
+//@Composable
+//fun ChipPreview() {
+//     MaterialTheme{
+//        Surface(modifier = Modifier.size(80.dp, 20.dp)) {
+//            FilterChip(selected = true, onSelectedChange = {}) {
+//                Text("Chip")
+//            }
+//        }
+//    }
+//}
 
 /**
  * Now in Android chip default values.

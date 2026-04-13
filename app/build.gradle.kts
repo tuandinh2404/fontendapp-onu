@@ -45,6 +45,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.designsystem)
+
     implementation(projects.feature.auth.api)
     implementation(projects.feature.auth.impl)
     implementation(projects.feature.moments.api)
@@ -53,6 +55,10 @@ dependencies {
     implementation(projects.feature.messenger.impl)
     implementation(projects.feature.foryou.api)
     implementation(projects.feature.foryou.impl)
+    implementation(projects.feature.friends.api)
+    implementation(projects.feature.friends.impl)
+    implementation(projects.feature.profile.api)
+    implementation(projects.feature.profile.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

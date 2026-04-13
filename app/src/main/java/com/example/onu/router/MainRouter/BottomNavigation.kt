@@ -28,8 +28,8 @@ import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.DpOffset
+import com.example.designsystem.icon.OnuIcons
 import com.example.onu.R
-import com.example.onu.features.camera.ui.itemsTest
 import com.example.onu.ui.theme.DarkGray
 import com.example.onu.ui.theme.LightGray
 import com.example.onu.ui.utils.BottomNavigationIcon
@@ -41,9 +41,9 @@ private data class NavItem(
 )
 
 private val navItems = listOf(
-    NavItem(MainTab.Home, R.drawable.home_fill, R.drawable.home_bold),
-    NavItem(MainTab.Friend, R.drawable.friends, R.drawable.friends),
-    NavItem(MainTab.Notification, R.drawable.heart_fill, R.drawable.heart)
+    NavItem(MainTab.Home, OnuIcons.HomeFill, OnuIcons.HomeBold),
+    NavItem(MainTab.Friend, OnuIcons.Friends, OnuIcons.Friends),
+    NavItem(MainTab.Notification, OnuIcons.Notification, OnuIcons.Notification)
 )
 
 @Composable

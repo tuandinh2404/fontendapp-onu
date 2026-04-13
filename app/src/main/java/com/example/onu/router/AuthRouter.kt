@@ -12,9 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.impl.LoginScreen
 import com.example.impl.RegisterScreen
-import com.example.onu.features.auth.ui.login.login_screen
-import com.example.onu.features.auth.ui.openning.openning_screen
-import com.example.onu.features.auth.ui.register.register_screen
+
 
 sealed class Auth_Router(
     val route: String
@@ -34,9 +32,9 @@ fun AuthRouter(
         navController = navController,
         startDestination = Auth_Router.NavigationBuilder.route
     ) {
-        composable(Auth_Router.OpenningScreen.route) {
-            openning_screen(navController)
-        }
+//        composable(Auth_Router.OpenningScreen.route) {
+//            openning_screen(navController)
+//        }
         composable(Auth_Router.LoginScreen.route) {
             LoginScreen(navController)
         }

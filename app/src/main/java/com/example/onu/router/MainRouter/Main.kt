@@ -1,24 +1,12 @@
 package com.example.onu.router.MainRouter
 
-import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -29,16 +17,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -51,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -60,24 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.onu.R
+import com.example.designsystem.icon.OnuIcons
+import com.example.moments.CameraViewModel
 import com.example.onu.core.ui.overlay.frame.PixelSpeechBubble
-import com.example.onu.core.ui.overlay.frame.TornEdges
-import com.example.onu.core.ui.overlay.frame.TornPaperNote
-import com.example.onu.features.Notification.ui.notify_screen
 import com.example.onu.features.friends.ui.friend_screen
-import com.example.onu.features.moments.CameraViewModel
-import com.example.onu.features.moments.ui.PagerViewModel
-import com.example.onu.features.moments.ui.component.bottom_sheet_profile
-import com.example.onu.features.profile.ui.profile_screen
-import com.example.onu.features.view_more.ui.view_more
+import com.example.moments.component.bottom_sheet_profile
 import com.example.onu.router.MainRouter.home_navigation.home_nav
-import com.example.onu.router.NavigationBuilder_Router
 import com.example.onu.ui.theme.DarkGray
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.OptIn
-import kotlin.math.abs
 
 enum class MainTab {
     Home,
@@ -208,7 +181,7 @@ fun Main(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.back_tab), // thay icon
+                        painter = painterResource(OnuIcons.ArrowBack),
                         contentDescription = "Back",
                         tint = Color.Black
                     )

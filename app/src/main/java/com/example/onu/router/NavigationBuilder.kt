@@ -13,8 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.onu.features.create_moment.ui.create_moment
-import com.example.onu.features.moments.ui.messenger_detail
+import com.example.moments.detail.messenger_detail
 import com.example.onu.router.MainRouter.Main
 
 
@@ -70,34 +69,6 @@ fun NavigationBuilder(
                 },
             ) {
                 messenger_detail(builderController)
-            }
-            composable(
-                NavigationBuilder_Router.create_moment.route,
-                enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                    )
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                    )
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                    )
-                },
-            ) {
-                create_moment(
-                    builderController = builderController,
-                    backScreen = { builderController.navigateUp() }
-                )
             }
 
 
