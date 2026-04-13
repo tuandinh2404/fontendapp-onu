@@ -1,3 +1,8 @@
+import java.io.StringReader
+import java.util.Properties
+import com.android.build.api.variant.BuildConfigField
+
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -6,10 +11,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.network"
-    compileSdk {
-        version = release(36)
+    buildFeatures {
+        buildConfig = true
     }
+    namespace = "com.example.network"
+    compileSdk = 36
+
 
     defaultConfig {
         minSdk = 28
@@ -44,4 +51,28 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+}
+
+val backendUrl: Provider<String> =  providers
+    .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
+    .asText
+    .map { text ->
+    val properties = Properties().apply { load(StringReader(text)) }
+    properties.getProperty("BACKEND_URL", "http://example.com")
+}
+    .orElse("http://example.com")
+
+androidComponents {
+    onVariants { variant ->
+        variant.buildConfigFields?.put(
+            "BACKEND_URL",
+            backendUrl.map { value ->
+                BuildConfigField(
+                    type = "String",
+                    value = "\"$value\"",
+                    comment = null
+                )
+            }
+        )
+    }
 }

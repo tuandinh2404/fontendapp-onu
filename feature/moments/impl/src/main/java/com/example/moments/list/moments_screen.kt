@@ -3,12 +3,15 @@ package com.example.moments.list
 import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -24,35 +27,6 @@ data class PageItem(
     val name: String
 )
 
-// ViewModel
-class PagerViewModel : ViewModel() {
-    private val imageList = listOf(
-        R.drawable.anhhh,
-        R.drawable.anh1,
-        R.drawable.anh2,
-        R.drawable.anh3,
-        R.drawable.anh4,
-    )
-    private val nameUser = listOf(
-        "Alexxander",
-        "Romeoooo",
-        "Violett",
-        "RonaldoooCr7",
-        "Joinnyyy"
-    )
-    val items = List(imageList.size) { index ->
-        PageItem(
-            id = index + 1,
-            title = "Trang ${index + 1}",
-            subtitle = "Vuốt lên để xem trang tiếp theo",
-            backgroundColor = imageList,
-            accentColor = Color.White,
-            name = nameUser[index]
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun moments_screen(
     mainController: NavHostController,
@@ -74,18 +48,17 @@ fun moments_screen(
     Box(
         Modifier
             .fillMaxSize()
-            .background()
     ) {
-        moments_statusbar_effect(darkIcons = true)
+//        moments_statusbar_effect(darkIcons = true)
 
-        moments_content(
-            mainController = mainController,
-            builderController = builderController,
-            isCaptured = isCaptured,
-            onCapture = onCapture,
-            onPhotoTaken = onPhotoTaken,
-            isHomeActive = isHomeActive
-        )
+//        moments_content(
+//            mainController = mainController,
+//            builderController = builderController,
+//            isCaptured = isCaptured,
+//            onCapture = onCapture,
+//            onPhotoTaken = onPhotoTaken,
+//            isHomeActive = isHomeActive
+//        )
 //        moments_topbar(
 //            modifier = Modifier
 //                .align(Alignment.TopCenter),
