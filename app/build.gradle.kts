@@ -59,6 +59,8 @@ dependencies {
     implementation(projects.feature.friends.impl)
     implementation(projects.feature.profile.api)
     implementation(projects.feature.profile.impl)
+    implementation(projects.feature.notification.api)
+    implementation(projects.feature.notification.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

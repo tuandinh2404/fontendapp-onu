@@ -28,12 +28,21 @@
             <option value="$PROJECT_DIR$/feature/foryou" />
             <option value="$PROJECT_DIR$/feature/foryou/api" />
             <option value="$PROJECT_DIR$/feature/foryou/impl" />
+            <option value="$PROJECT_DIR$/feature/friends" />
+            <option value="$PROJECT_DIR$/feature/friends/api" />
+            <option value="$PROJECT_DIR$/feature/friends/impl" />
             <option value="$PROJECT_DIR$/feature/messenger" />
             <option value="$PROJECT_DIR$/feature/messenger/api" />
             <option value="$PROJECT_DIR$/feature/messenger/impl" />
             <option value="$PROJECT_DIR$/feature/moments" />
             <option value="$PROJECT_DIR$/feature/moments/api" />
             <option value="$PROJECT_DIR$/feature/moments/impl" />
+            <option value="$PROJECT_DIR$/feature/notification" />
+            <option value="$PROJECT_DIR$/feature/notification/api" />
+            <option value="$PROJECT_DIR$/feature/notification/impl" />
+            <option value="$PROJECT_DIR$/feature/profile" />
+            <option value="$PROJECT_DIR$/feature/profile/api" />
+            <option value="$PROJECT_DIR$/feature/profile/impl" />
           </set>
         </option>
       </GradleProjectSettings>

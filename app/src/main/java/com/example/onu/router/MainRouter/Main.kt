@@ -44,10 +44,11 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.designsystem.icon.OnuIcons
+import com.example.impl.bottom_sheet_profile
+import com.example.impl.friend_screen
+import com.example.impl.notify_screen
 import com.example.moments.CameraViewModel
 import com.example.onu.core.ui.overlay.frame.PixelSpeechBubble
-import com.example.onu.features.friends.ui.friend_screen
-import com.example.moments.component.bottom_sheet_profile
 import com.example.onu.router.MainRouter.home_navigation.home_nav
 import com.example.onu.ui.theme.DarkGray
 import kotlin.OptIn
@@ -124,7 +125,7 @@ fun Main(
             }
         }
         if (uiState.showBottomSheet) {
-            bottom_sheet_profile(
+            bottom_sheet_profile (
                 sheetState,
                 builderController,
                 mainController,
