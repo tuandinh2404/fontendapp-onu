@@ -1,4 +1,4 @@
-package com.example.moments.component
+package com.example.impl.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,7 @@ import com.example.designsystem.icon.OnuIcons
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun moments_topbar(
+fun friend_topbar(
     modifier : Modifier = Modifier,
     progress:() -> Float,
     onOpen: () -> Unit,

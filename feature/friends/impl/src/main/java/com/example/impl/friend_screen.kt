@@ -32,8 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
 import com.example.designsystem.theme.LightGray
-import com.example.impl.FriendsSection
-import com.example.impl.ShareLinkSection
+import com.example.impl.components.friend_topbar
 import com.example.ui.customOverScroll
 
 
@@ -69,15 +68,15 @@ fun friend_screen(
             onTextChange = { text = it },
             onFocusChange = { isFocused = it }
         )
-//        moments_topbar(
-//            modifier = Modifier
-//                .align(Alignment.TopCenter),
-//            progress = { progress },
-//            onOpen = {
-//                offsetY = 0f
-//                hasNavigated = false
-//            }
-//        )
+        friend_topbar(
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            progress = { progress },
+            onOpen = {
+                offsetY = 0f
+                hasNavigated = false
+            }
+        )
 
 
     }
@@ -135,7 +134,7 @@ fun LazyListScope.FriendsSection(
             }
         }
     }
-    items(10, key = { "friend_$it" }) {
+    items(20, key = { "friend_$it" }) {
         Row(
             Modifier
                 .fillMaxWidth()
