@@ -1,6 +1,7 @@
 package com.example.network.datasource
 
 import com.example.network.model.AuthResponse
+import com.example.network.model.CheckUsernameResponse
 import com.example.network.model.LoginRequest
 import com.example.network.model.SignupRequest
 import com.example.network.retrofit.AuthApi
@@ -20,5 +21,9 @@ class RetrofitAuthNetwork @Inject constructor(
 
     override suspend fun login(request: LoginRequest): AuthResponse {
         return api.login(request)
+    }
+
+    override suspend fun checkUsername(username: String): CheckUsernameResponse {
+         return api.checkUsername(username)
     }
 }
