@@ -9,6 +9,7 @@ import javax.inject.Singleton
 import com.example.network.BuildConfig
 import com.example.network.datasource.AuthNetworkDataSource
 import com.example.network.datasource.RetrofitAuthNetwork
+import com.example.network.interceptor.AuthInterceptor
 import com.example.network.retrofit.AuthApi
 import dagger.Binds
 import okhttp3.OkHttpClient
@@ -27,24 +28,31 @@ abstract class NetworkModule {
     ): AuthNetworkDataSource
 
     companion object {
+
         @Provides
         @Singleton
-        fun provideRetrofit(): Retrofit {
+        fun provideOkHttpClient(
+            authInterceptor: AuthInterceptor
+        ): OkHttpClient {
+            return OkHttpClient.Builder()
+                .addInterceptor(
+                    HttpLoggingInterceptor().apply {
+                        if (BuildConfig.DEBUG) setLevel(HttpLoggingInterceptor.Level.BODY)
+                    }
+                )
+                .addInterceptor(authInterceptor)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build()
+
+        }
+        @Provides
+        @Singleton
+        fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
             return Retrofit.Builder()
                 .baseUrl(BuildConfig.BACKEND_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(
-                    OkHttpClient.Builder()
-                        .addInterceptor(
-                            HttpLoggingInterceptor().apply {
-                                if (BuildConfig.DEBUG) setLevel(HttpLoggingInterceptor.Level.BODY)
-                            }
-                        )
-                        .connectTimeout(5, TimeUnit.SECONDS)
-                        .readTimeout(5, TimeUnit.SECONDS)
-                        .build()
-
-                )
+                .client(okHttpClient)
                 .build()
         }
 

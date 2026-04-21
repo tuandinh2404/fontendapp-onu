@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -39,15 +40,19 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.designsystem.icon.OnuIcons
+import com.example.designsystem.theme.LightGray
 import com.example.impl.bottom_sheet_profile
 import com.example.impl.friend_screen
 import com.example.impl.notify_screen
 import com.example.moments.CameraViewModel
+import com.example.moments.detail.moments_preview
 import com.example.onu.core.ui.overlay.frame.PixelSpeechBubble
 import com.example.onu.router.MainRouter.home_navigation.home_nav
 import com.example.onu.ui.theme.DarkGray
@@ -193,64 +198,9 @@ fun Main(
             BackHandler {
                 viewModel.closePreview()
             }
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .zIndex(10f)
-                    .pointerInput(Unit) {}
-                    .background(DarkGray)
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                )
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(4f/5f)
-                        .clip(RoundedCornerShape(15.dp))
-                ) {
-                    viewModel.capturedBitmap?.let { bitmap ->
-                        AsyncImage(
-                            model = viewModel.capturedBitmap,
-                            contentDescription = "Captured Image",
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                    Box(
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 20.dp)
-                    ) {
-                        PixelSpeechBubble(
-                            text = "Game Over",
-                            fillColor = Color(0xFFFF6B6B),   // pixel red
-                        )
-                    }
-                }
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentAlignment = Alignment.Center
-
-                ) {
-                    Box(
-                        Modifier
-                            .padding(start = 6.dp)
-                    ) {
-                        Box(
-                            Modifier
-                                .size(90.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                        )
-                    }
-                }
-            }
+            moments_preview(
+                viewModel = viewModel
+            )
         }
     }
 }

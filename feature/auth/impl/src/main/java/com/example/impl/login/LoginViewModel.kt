@@ -1,12 +1,10 @@
-package com.example.impl.viewmodel
+package com.example.impl.login
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.AuthRepository
+import com.example.datastore.session.SessionManager
 import com.example.network.model.LoginRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -29,7 +27,8 @@ sealed class LoginUiState {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val sessionManager: SessionManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -43,6 +42,7 @@ class LoginViewModel @Inject constructor(
             authRepository.login(LoginRequest(username, password))
                 .onSuccess { success ->
                     Log.d("LoginViewModel", "Đăng nhập thành công:\n token=${success.token}")
+                    sessionManager.saveToken(success.token)
                     _uiState.value = LoginUiState.Success
                 }
                 .onFailure { error ->

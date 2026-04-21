@@ -21,4 +21,5 @@ object OnuIcons {
     //Password
     val EyeShow = R.drawable.eye_show
     val EyeHide = R.drawable.eye_close
+    val ArrowRight = R.drawable.arrow_right
 }

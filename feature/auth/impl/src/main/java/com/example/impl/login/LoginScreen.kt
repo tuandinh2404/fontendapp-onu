@@ -1,4 +1,4 @@
-package com.example.impl
+package com.example.impl.login
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -46,8 +46,9 @@ import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
 import com.example.designsystem.theme.LightGray
-import com.example.impl.viewmodel.LoginUiState
-import com.example.impl.viewmodel.LoginViewModel
+import com.example.impl.login.components.LoginButton
+import com.example.impl.login.components.LoginTextField
+import com.example.impl.login.components.TopBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,9 +78,7 @@ fun LoginScreen(
 
     LaunchedEffect(uiState) {
         when (uiState) {
-            is LoginUiState.Success -> {
-                goMain()
-            }
+            is LoginUiState.Success -> { goMain() }
             is LoginUiState.UserValid -> showPassword = true
             else -> Unit
         }
@@ -144,60 +143,6 @@ fun LoginScreen(
 
 }
 
-@Composable
-private fun TopBar(
-    goBack:() -> Unit,
-    goRegister:() -> Unit
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(80.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
-    ) {
-        Box(
-            Modifier
-                .padding(
-                    start = 20.dp
-                )
-        ) {
-            Icon(
-                painter = painterResource(OnuIcons.ArrowBack),
-                contentDescription = "Back",
-                tint = LightGray,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        goBack()
-                    }
-            )
-        }
-//        Box(
-//            Modifier
-//                .padding(
-//                    end = 20.dp
-//                )
-//        ) {
-//            Text(
-//                text = "Đã có tài khoản!",
-//                fontSize = 20.sp,
-//                color = LightGray,
-//                modifier = Modifier
-//                    .clickable(
-//                        indication = null,
-//                        interactionSource = remember { MutableInteractionSource() }
-//                    ) {
-//                        goRegister()
-//                    }
-//            )
-//        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginContent(
@@ -216,7 +161,8 @@ private fun LoginContent(
     var passwordVisible by remember { mutableStateOf(false) }
 
     val isError = uiState is LoginUiState.UserNotFound
-    val errorMessage = (uiState as? LoginUiState.UserNotFound)?.message
+    val isPasswordError = uiState is LoginUiState.Error
+
 
     LaunchedEffect(Unit) {
         usernameFocusRequester.requestFocus()
@@ -252,30 +198,16 @@ private fun LoginContent(
             .fillMaxWidth()
 
     ) {
-        TextField(
-            value = textUsername,
-            onValueChange = { input ->
+        LoginTextField(
+            valueText = textUsername,
+            onChange = { input ->
                 if (input.length <= 20 && input.all { (it.isLetterOrDigit() || it == '_') && it.code < 128 }) {
                     onTextUsernameChange(input)
                     clearError()
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .focusRequester(usernameFocusRequester),
-            placeholder = {
-                Text(
-                    text = "Tên đăng nhập",
-                    fontSize = 25.sp,
-                    color = Color.Gray
-                )
-            },
-            textStyle = TextStyle(
-                fontSize = 25.sp,
-                color = LightGray,
-                fontWeight = FontWeight.ExtraBold
-            ),
+            placeholder = "Tên đăng nhập",
+            clearError = clearError,
             leadingIcon = {
                 Icon(
                     painter = painterResource(OnuIcons.User),
@@ -289,24 +221,12 @@ private fun LoginContent(
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    onUsernameNext()
-                }
+                onDone = { onUsernameNext() }
             ),
-            singleLine = true,
-            enabled = !showPassword,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Blue.copy(alpha = 0.8f),
-                disabledContainerColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                disabledTextColor = Color.Transparent
-            )
+            focusRequester = usernameFocusRequester,
+            isError = isError,
+            enabled = !showPassword
         )
-
     }
 
     if(textUsername.isNotEmpty() && !isError && !showPassword) {
@@ -370,57 +290,49 @@ private fun LoginContent(
             onPasswordDone = onPasswordDone,
             onTogglePassword = { passwordVisible = !passwordVisible },
             passwordVisible = passwordVisible,
+            clearError = clearError,
             showPassword = showPassword,
-            passwordFocusRequester = passwordFocusRequester
+            passwordFocusRequester = passwordFocusRequester,
+            isPasswordError = isPasswordError
         )
     }
-}
-
-@Composable
-private fun LoginButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    isLoading: Boolean = false,
-    onClick: () -> Unit = {}
-) {
-    Box(
-        modifier
-            .fillMaxWidth()
-            .padding(
-                bottom = 20.dp
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
+    if(isPasswordError) {
+        Row(
             Modifier
-                .fillMaxWidth(0.9f)
-                .height(60.dp)
-                .clip(CircleShape)
-                .background(if (text.isNotEmpty()) LightGray else Color.Gray)
-                .clickable(
-                    enabled = text.isNotEmpty() && !isLoading,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) { onClick() },
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(
+                    top = 20.dp,
+                    start = 20.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if(isLoading) {
-                CircularProgressIndicator(
-                    color = DarkGray,
-                    modifier = Modifier
-                        .size(30.dp)
-                )
-            } else {
-                Text(
-                    text = "Tiếp tục",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = if (text.isNotEmpty()) DarkGray else LightGray.copy(alpha = 0.2f),
-                )
-            }
+//            Box(
+//                Modifier
+//                    .size(15.dp)
+//                    .background(
+//                        color = Color.Red,
+//                        shape = CircleShape
+//                    ),
+//                contentAlignment = Alignment.Center
+//
+//            ) {
+//                Icon(
+//                    painter = painterResource(OnuIcons.Close),
+//                    contentDescription = "Error",
+//                    tint = Color.White,
+//                    modifier = Modifier
+//                        .size(15.dp)
+//                )
+//            }
+            Text(
+                text = "Mật khẩu bạn đã nhập không chính xác!",
+                fontSize = 15.sp,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
-
 }
 
 @Composable
@@ -430,8 +342,10 @@ fun InputPassword(
     onPasswordDone: () -> Unit,
     onTogglePassword: () -> Unit,
     passwordVisible: Boolean,
+    clearError: () -> Unit,
     showPassword: Boolean,
-    passwordFocusRequester: FocusRequester
+    passwordFocusRequester: FocusRequester,
+    isPasswordError: Boolean
 ) {
     AnimatedVisibility(
         visible = showPassword,
@@ -440,28 +354,14 @@ fun InputPassword(
         modifier =  Modifier
             .fillMaxWidth()
     ) {
-        TextField(
-            value = textPassword,
-            onValueChange = {
+        LoginTextField(
+            valueText = textPassword,
+            onChange = {
                 onTextPasswordChange(it)
+                clearError()
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .focusRequester(passwordFocusRequester),
-            placeholder = {
-                Text(
-                    text = "Mật khẩu",
-                    fontSize = 25.sp,
-                    color = Color.Gray.copy(alpha = 0.5f)
-                )
-            },
-            textStyle = TextStyle(
-                fontSize = 25.sp,
-                color = LightGray,
-                fontWeight = FontWeight.ExtraBold
-            ),
-            visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            placeholder = "Mật khẩu",
+            clearError = clearError,
             trailingIcon = {
                 Icon(
                     painter = painterResource(
@@ -485,14 +385,8 @@ fun InputPassword(
             keyboardActions = KeyboardActions(
                 onDone = { onPasswordDone() }
             ),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Blue.copy(alpha = 0.8f)
-            )
+            focusRequester = passwordFocusRequester,
+            isError = isPasswordError
         )
 
     }

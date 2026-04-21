@@ -1,25 +1,22 @@
 package com.example.onu.router
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import com.example.designsystem.theme.DarkGray
-import com.example.impl.LoginScreen
-import com.example.impl.OpenningScreen
-import com.example.impl.RegisterScreen
+import com.example.impl.login.LoginScreen
+import com.example.impl.openning.OpenningScreen
+import com.example.impl.register.RegisterScreen
 
 
 sealed class Auth_Router(
@@ -44,7 +41,20 @@ fun AuthRouter(
             .fillMaxSize()
             .background(DarkGray)
     ) {
-        composable(Auth_Router.OpenningScreen.route) {
+        composable(Auth_Router.OpenningScreen.route,
+            enterTransition = {
+                EnterTransition.None
+            },
+            exitTransition = {
+                ExitTransition.None
+            },
+            popEnterTransition = {
+                EnterTransition.None
+            },
+            popExitTransition = {
+                ExitTransition.None
+            }
+        ) {
             OpenningScreen(
                 navController = navController,
                 goToRegister = {

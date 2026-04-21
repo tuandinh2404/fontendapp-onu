@@ -1,9 +1,11 @@
-package com.example.impl
+package com.example.impl.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -20,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,8 +31,16 @@ import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
 import com.example.designsystem.theme.LightGray
-import com.example.impl.viewmodel.RegisterViewModel
+import com.example.impl.register.components.StepTextField
+import com.example.impl.register.components.TopBar
 
+
+enum class SignupStep {
+    USERNAME,
+    PASSWORD,
+    FULLNAME,
+    UID,
+}
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
@@ -63,60 +75,6 @@ fun RegisterScreen(
 }
 
 @Composable
-private fun TopBar(
-    goBack:() -> Unit,
-    goLogin:() -> Unit
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(80.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
-    ) {
-        Box(
-            Modifier
-                .padding(
-                    start = 20.dp
-                )
-        ) {
-            Icon(
-                painter = painterResource(OnuIcons.ArrowBack),
-                contentDescription = "Back",
-                tint = LightGray,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        goBack()
-                    }
-            )
-        }
-//        Box(
-//            Modifier
-//                .padding(
-//                    end = 20.dp
-//                )
-//        ) {
-//            Text(
-//                text = "Đã có tài khoản!",
-//                fontSize = 20.sp,
-//                color = LightGray,
-//                modifier = Modifier
-//                    .clickable(
-//                        indication = null,
-//                        interactionSource = remember { MutableInteractionSource() }
-//                    ) {
-//                        goLogin()
-//                    }
-//            )
-//        }
-    }
-}
-
-@Composable
 fun RegisterContent(
     textUsername: String,
     onChangeUsername: (String) -> Unit
@@ -130,7 +88,7 @@ fun RegisterContent(
             )
     ) {
         Text(
-            text = "Nghĩ về tên đăng nhập của bạn!",
+            text = "Nghĩ về tên đăng nhập của bạn?",
             fontSize = 40.sp,
             fontWeight = FontWeight.ExtraBold,
             color = LightGray
@@ -146,40 +104,55 @@ fun RegisterContent(
         Modifier
             .fillMaxWidth()
     ) {
-        TextField(
+        StepTextField(
             value = textUsername,
-            onValueChange = { input ->
+            onChange = { input ->
                 if (input.length <= 20 && input.all { (it.isLetterOrDigit() || it == '_') && it.code < 128 }) {
                     onChangeUsername(input)
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            placeholder = {
-                Text(
-                    text = "Tên đăng nhập",
-                    fontSize = 25.sp,
-                    color = Color.Gray
-                )
-            },
-            textStyle = TextStyle(
-                fontSize = 25.sp,
-                color = LightGray,
-                fontWeight = FontWeight.ExtraBold
-            ),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Blue.copy(alpha = 0.8f),
-                disabledContainerColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                disabledTextColor = Color.Transparent
-            )
+            placeholder = "Tên đăng nhập",
+
         )
+    }
+    if(textUsername.isEmpty()) {
+        Box(
+            Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                Modifier
+                    .fillMaxWidth(0.9f),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(Color.Gray)
+                )
+                Box(
+                    Modifier
+                        .weight(0.5f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "hoặc",
+                        fontSize = 15.sp,
+                        color = Color.Gray,
+                    )
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(Color.Gray)
+                )
+            }
+        }
     }
 
 }
+

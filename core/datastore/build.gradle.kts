@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    id("kotlin-kapt")
 }
 
 android {
@@ -36,8 +38,14 @@ android {
 
 dependencies {
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

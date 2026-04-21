@@ -26,7 +26,6 @@ class CameraViewModel : ViewModel() {
     fun onCapture(pressScale:Float) {
         isCaptured = true
         capturedPressScale = pressScale
-        isOpenedPreview = true
     }
 
 
@@ -35,6 +34,8 @@ class CameraViewModel : ViewModel() {
         viewModelScope.launch {
             delay(300)
             isCaptured = false
+            isOpenedPreview = true
+
         }
     }
 
