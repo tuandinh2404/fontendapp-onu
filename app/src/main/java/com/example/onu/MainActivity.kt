@@ -33,13 +33,8 @@ class MainActivity : ComponentActivity() {
                 LocalOverscrollConfiguration provides null
             ) {
                 AuthRouter()
+
             }
         }
-    }
-    companion object {
-        val CAMERAX_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        )
     }
 }

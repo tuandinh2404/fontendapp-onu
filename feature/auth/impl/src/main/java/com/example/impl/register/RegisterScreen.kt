@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,16 +32,13 @@ import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
 import com.example.designsystem.theme.LightGray
+import com.example.impl.register.components.CustomStepProgress
+import com.example.impl.register.components.RegisterContent
 import com.example.impl.register.components.StepTextField
 import com.example.impl.register.components.TopBar
 
 
-enum class SignupStep {
-    USERNAME,
-    PASSWORD,
-    FULLNAME,
-    UID,
-}
+
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
@@ -48,8 +46,9 @@ fun RegisterScreen(
     goToLogin:() -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    var textUsername by remember { mutableStateOf("") }
+    val formState by viewModel.formState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
+
     Box(
         Modifier
             .fillMaxSize()
@@ -60,99 +59,33 @@ fun RegisterScreen(
             Modifier.fillMaxWidth()
         ) {
             TopBar(
-                goBack = goBack,
+                goBack = {
+                    if(formState.step == SignupStep.USERNAME) {
+                        goBack()
+                    } else {
+                        viewModel.goBack()
+                    }
+                },
                 goLogin = goToLogin
             )
+            CustomStepProgress(
+                currentStep = formState.step.getStepNumber(),
+                totalSteps = 5,
+                modifier = Modifier.padding(top =  10.dp)
+            )
             RegisterContent(
-                textUsername = textUsername,
-                onChangeUsername = { username ->
-                    textUsername = username
-                }
+                formState = formState,
+                uiState = uiState,
+                onCheckUsername = { viewModel.checkUsername(it) },
+                onNextStep = { viewModel.nextStep(it) },
+                onSignUp = { password, fullName, uid ->
+                    viewModel.signUp(password, fullName, uid) },
+                onClearError = { viewModel.clearError() }
             )
         }
 
     }
 }
 
-@Composable
-fun RegisterContent(
-    textUsername: String,
-    onChangeUsername: (String) -> Unit
-) {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .padding(
-                start = 20.dp,
-                top = 20.dp
-            )
-    ) {
-        Text(
-            text = "Nghĩ về tên đăng nhập của bạn?",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = LightGray
-        )
 
-    }
-    Spacer(
-        Modifier
-            .fillMaxWidth()
-            .height(20.dp)
-    )
-    Box(
-        Modifier
-            .fillMaxWidth()
-    ) {
-        StepTextField(
-            value = textUsername,
-            onChange = { input ->
-                if (input.length <= 20 && input.all { (it.isLetterOrDigit() || it == '_') && it.code < 128 }) {
-                    onChangeUsername(input)
-                }
-            },
-            placeholder = "Tên đăng nhập",
-
-        )
-    }
-    if(textUsername.isEmpty()) {
-        Box(
-            Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                Modifier
-                    .fillMaxWidth(0.9f),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(Color.Gray)
-                )
-                Box(
-                    Modifier
-                        .weight(0.5f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "hoặc",
-                        fontSize = 15.sp,
-                        color = Color.Gray,
-                    )
-                }
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(Color.Gray)
-                )
-            }
-        }
-    }
-
-}
 
