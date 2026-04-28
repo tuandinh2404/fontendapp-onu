@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
@@ -62,7 +63,7 @@ fun LoginScreen(
 ) {
 
     var textUsername by remember { mutableStateOf("") }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showPassword by remember { mutableStateOf(false) }
     var textPassword by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
@@ -83,6 +84,12 @@ fun LoginScreen(
             is LoginUiState.UserValid -> showPassword = true
             else -> Unit
         }
+    }
+
+    val enabledButton = if (!showPassword) {
+        textUsername.isNotEmpty() && textUsername.length >= 6
+    } else {
+        textPassword.isNotEmpty()
     }
     Box(
         Modifier
@@ -130,7 +137,7 @@ fun LoginScreen(
         LoginButton(
             modifier = Modifier
                 .align(Alignment.BottomCenter),
-            text = if(showPassword) textPassword else textUsername,
+            text = enabledButton,
             isLoading = uiState is LoginUiState.CheckingUsername || uiState is LoginUiState.LoggingIn,
             onClick = {
                 if(!showPassword) {

@@ -29,6 +29,10 @@ include(":core:domain")
 include(":core:model")
 include(":core:designsystem")
 include(":core:navigation")
+include(":core:datastore")
+include(":core:common")
+include(":core:ui")
+include(":core:database")
 
 include(":feature:moments:impl")
 include(":feature:moments:api")
@@ -36,21 +40,6 @@ include(":feature:messenger:impl")
 include(":feature:messenger:api")
 include(":feature:foryou:api")
 include(":feature:foryou:impl")
-
-
-check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
-    """
-    Now in Android requires JDK 17+ but it is currently using JDK ${JavaVersion.current()}.
-    Java Home: [${System.getProperty("java.home")}]
-    https://developer.android.com/build/jdks#jdk-config-in-studio
-    """.trimIndent()
-}
-
-
-
-include(":core:common")
-include(":core:ui")
-include(":core:database")
 include(":feature:auth:api")
 include(":feature:auth:impl")
 include(":feature:friends:api")
@@ -59,4 +48,11 @@ include(":feature:profile:impl")
 include(":feature:profile:api")
 include(":feature:notification:impl")
 include(":feature:notification:api")
-include(":core:datastore")
+
+check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
+    """
+    Now in Android requires JDK 17+ but it is currently using JDK ${JavaVersion.current()}.
+    Java Home: [${System.getProperty("java.home")}]
+    https://developer.android.com/build/jdks#jdk-config-in-studio
+    """.trimIndent()
+}

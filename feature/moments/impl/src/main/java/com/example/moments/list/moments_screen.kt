@@ -36,14 +36,6 @@ fun moments_screen(
     onPhotoTaken: (Bitmap) -> Unit,
     isHomeActive: Boolean
 ) {
-    val scope = rememberCoroutineScope()
-    var offsetY by remember { mutableFloatStateOf(0f) }
-    var hasNavigated by remember { mutableStateOf(false) }
-    val maxDrag = 300f
-    val progress = (offsetY / maxDrag).coerceIn(0f, 1f)
-    val haptic = LocalHapticFeedback.current
-
-
     Box(
         Modifier
             .fillMaxSize()
@@ -58,16 +50,5 @@ fun moments_screen(
             onPhotoTaken = onPhotoTaken,
             isHomeActive = isHomeActive
         )
-//        moments_topbar(
-//            modifier = Modifier
-//                .align(Alignment.TopCenter),
-//            progress = { progress },
-//            onOpen = {
-//                onOpen {
-//                    offsetY = 0f
-//                    hasNavigated = false
-//                }
-//            }
-//        )
     }
 }

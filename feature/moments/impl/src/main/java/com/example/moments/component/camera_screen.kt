@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,11 @@ fun camera_screen(
     var isFlashCamera by remember { mutableStateOf(false) }
 
 
-
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraController.pauseAnalysis()
+        }
+    }
     LaunchedEffect(Unit) {
         controller.bindToLifecycle(lifecycleOwner)
         cameraController.startAnalisis()

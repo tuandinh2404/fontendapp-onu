@@ -36,7 +36,7 @@ class camera_controller(
 
     fun startAnalisis() {
         controller.setImageAnalysisAnalyzer(
-            ContextCompat.getMainExecutor(context)
+            analysisExecutor
         ) { imageProxy ->
             val bitmap = imageProxy.toBitmap()
             val matrix = Matrix().apply {

@@ -32,51 +32,16 @@ fun home_nav(
     onPhotoTaken: (Bitmap) -> Unit,
     isHomeActive: Boolean
     ) {
-
-    val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { 2 }
-    )
-    val fling = PagerDefaults.flingBehavior(
-        state = pagerState,
-        snapAnimationSpec = tween(
-            easing = LinearEasing,
-            durationMillis = 300
-        ),
-        snapPositionalThreshold = 0.35f
-    )
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
-    var isGridMode by remember { mutableStateOf(false) }
-    val isMomentsPage by remember {
-        derivedStateOf { pagerState.currentPage == 0 }
-    }
 
-
-
-    VerticalPager(
-        state = pagerState,
-        beyondViewportPageCount = 1,
-        userScrollEnabled = false
-    ) { page ->
-        when(page) {
-            0 -> moments_screen(
-                mainController = mainController,
-                builderController = builderController,
-                onOpen = onOpen,
-                isCaptured = isCaptured,
-                onCapture = onCapture,
-                onPhotoTaken = onPhotoTaken,
-                isHomeActive = isHomeActive
-            )
-            1 -> messenger_screen(
-                onBack = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(0)
-                    }
-                }
-            )
-        }
-    }
+    moments_screen(
+        mainController = mainController,
+        builderController = builderController,
+        onOpen = onOpen,
+        isCaptured = isCaptured,
+        onCapture = onCapture,
+        onPhotoTaken = onPhotoTaken,
+        isHomeActive = isHomeActive
+    )
 }

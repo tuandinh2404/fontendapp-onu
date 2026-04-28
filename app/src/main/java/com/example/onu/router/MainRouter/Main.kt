@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
@@ -83,12 +84,9 @@ fun Main(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val scope = rememberCoroutineScope()
-//    val scale by animateFloatAsState(
-//        targetValue = if (isCaptured) 0.6f else 1f,
-//        animationSpec = tween(400),
-//    )
+    val saveableStateHolder = rememberSaveableStateHolder()
 
+    val scope = rememberCoroutineScope()
 
     Box(
         Modifier
@@ -96,36 +94,39 @@ fun Main(
     ) {
         MainTab.entries.forEach { tab ->
             val isActive = uiState.currentTab == tab
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .alpha(if (isActive) 1f else 0f)
-                    .zIndex(if (isActive) 1f else 0f)
-                    .then(
-                        if(!isActive) Modifier.pointerInput(Unit) {}
-                        else Modifier
-                    )
-            ) {
-                when (tab) {
-                    MainTab.Home ->  home_nav(
-                        mainController = mainController,
-                        builderController = builderController,
-                        onOpen = { closeAction ->
-                            isOpened = true
-                            onCloseAction = closeAction
-                        },
-                        isCaptured = viewModel.isCaptured,
-                        onCapture = { pressScale ->
-                            viewModel.onCapture(pressScale)
-                        },
-                        onPhotoTaken = { bitmap ->
-                            viewModel.onPhotoTaken(bitmap)
+            saveableStateHolder.SaveableStateProvider(key = tab) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .alpha(if (isActive) 1f else 0f)
+                        .zIndex(if (isActive) 1f else 0f)
+                        .then(
+                            if (!isActive) Modifier.pointerInput(Unit) {}
+                            else Modifier
+                        )
+                ) {
+                    when (tab) {
+                        MainTab.Home -> home_nav(
+                            mainController = mainController,
+                            builderController = builderController,
+                            onOpen = { closeAction ->
+                                isOpened = true
+                                onCloseAction = closeAction
+                            },
+                            isCaptured = viewModel.isCaptured,
+                            onCapture = { pressScale ->
+                                viewModel.onCapture(pressScale)
+                            },
+                            onPhotoTaken = { bitmap ->
+                                viewModel.onPhotoTaken(bitmap)
 
-                        },
-                        isHomeActive = uiState.currentTab == MainTab.Home && !isOpened
-                    )
-                    MainTab.Friend -> friend_screen()
-                    MainTab.Notification -> notify_screen()
+                            },
+                            isHomeActive = uiState.currentTab == MainTab.Home && !isOpened
+                        )
+
+                        MainTab.Friend -> friend_screen()
+                        MainTab.Notification -> notify_screen()
+                    }
                 }
             }
         }

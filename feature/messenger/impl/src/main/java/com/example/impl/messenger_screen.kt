@@ -16,6 +16,7 @@ package com.example.impl
     import androidx.compose.runtime.setValue
     import androidx.compose.runtime.getValue
     import androidx.compose.runtime.mutableLongStateOf
+    import androidx.compose.runtime.rememberUpdatedState
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.draw.dropShadow
@@ -88,7 +89,7 @@ fun FriendsLayout(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 140.dp),
         pageSpacing = 20.dp,
-        beyondViewportPageCount = 1,
+        beyondViewportPageCount = 0,
         snapPosition = SnapPosition.Start,
     ) { page ->
         FriendCard(friends[page], onDoubleTap)
@@ -101,6 +102,8 @@ fun FriendCard(
     onDoubleTap: (String) -> Unit
 ) {
     var selectedEmoji by remember { mutableStateOf("🥲") }
+    val currentEmoji by rememberUpdatedState(selectedEmoji)
+
 
     Column(
         Modifier
@@ -130,10 +133,10 @@ fun FriendCard(
                         )
                     )
                     .background(Color.DarkGray, RoundedCornerShape(15.dp))
-                    .pointerInput(selectedEmoji) {
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
-                                onDoubleTap(selectedEmoji)
+                                onDoubleTap(currentEmoji)
                             }
                         )
                     }

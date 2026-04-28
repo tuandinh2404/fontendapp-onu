@@ -46,12 +46,12 @@ import com.example.impl.openning.OpenningViewModel
 @Composable
 fun ContinueButton(
     scale: Float,
-    viewModel: OpenningViewModel,
+    hasInteracted: Boolean,
     goToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
-        visible = viewModel.hasInteracted,
+        visible = hasInteracted,
         enter = fadeIn() + slideInVertically(
             initialOffsetY = { it },
         ),

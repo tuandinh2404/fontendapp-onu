@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,16 +33,16 @@ fun moments_pager(
     val context = LocalContext.current
     val hasPermissions = hasRequiredPermissions(context)
     val cameraController = remember { camera_controller(context) }
-//    DisposableEffect(isHomeActive) {
-//        if (isHomeActive) {
-//            cameraController.resumeAnalysis()
-//        } else {
-//            cameraController.pauseAnalysis()
-//        }
-//        onDispose {
-//            cameraController.pauseAnalysis()
-//        }
-//    }
+    DisposableEffect(isHomeActive) {
+        if (isHomeActive) {
+            cameraController.resumeAnalysis()
+        } else {
+            cameraController.pauseAnalysis()
+        }
+        onDispose {
+            cameraController.pauseAnalysis()
+        }
+    }
 
     Column(
         Modifier

@@ -26,7 +26,7 @@ import com.example.designsystem.theme.LightGray
 @Composable
 fun LoginButton(
     modifier: Modifier = Modifier,
-    text: String,
+    text: Boolean,
     isLoading: Boolean = false,
     onClick: () -> Unit = {}
 ) {
@@ -43,9 +43,9 @@ fun LoginButton(
                 .fillMaxWidth(0.9f)
                 .height(60.dp)
                 .clip(CircleShape)
-                .background(if (text.isNotEmpty()) LightGray else Color.Gray)
+                .background(if (text) LightGray else Color.Gray)
                 .clickable(
-                    enabled = text.isNotEmpty() && !isLoading,
+                    enabled = text && !isLoading,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) { onClick() },
@@ -62,7 +62,7 @@ fun LoginButton(
                     text = "Tiếp tục",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = if (text.isNotEmpty()) DarkGray else LightGray.copy(alpha = 0.2f),
+                    color = if (text) DarkGray else LightGray.copy(alpha = 0.2f),
                 )
             }
         }

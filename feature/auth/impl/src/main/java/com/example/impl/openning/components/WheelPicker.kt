@@ -79,11 +79,8 @@ fun WheelPicker(
             val realItem = items[index % items.size]
             val isCenter = distance == 0
 
-            val colorText = if(isCenter)  {
-                animateColorAsState(CoolWhite).value
-            } else {
-                Color.Gray
-            }
+            val colorText = if (isCenter) CoolWhite else Color.Gray
+
             Box(
                 Modifier
                     .height(itemHeight)

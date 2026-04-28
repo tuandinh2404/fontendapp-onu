@@ -118,7 +118,7 @@ fun OpenningScreen(
         }
         ContinueButton(
             scale = scale,
-            viewModel = viewModel,
+            hasInteracted = viewModel.hasInteracted,
             goToRegister = goToRegister,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
