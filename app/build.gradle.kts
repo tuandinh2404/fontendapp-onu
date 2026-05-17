@@ -46,6 +46,9 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
+    implementation(projects.core.data)
+    implementation(projects.core.network)
+    implementation(projects.core.datastore)
 
     implementation(projects.feature.auth.api)
     implementation(projects.feature.auth.impl)

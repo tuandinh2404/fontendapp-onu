@@ -58,6 +58,7 @@ import com.example.impl.openning.components.OpenningContent
 import com.example.impl.openning.components.TopBar
 import com.example.impl.openning.components.WheelPicker
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.abs
 import kotlin.math.cos
 
@@ -77,23 +78,16 @@ fun OpenningScreen(
 
     LaunchedEffect(listStateDay, listStateMonth) {
         snapshotFlow { listStateDay.isScrollInProgress || listStateMonth.isScrollInProgress }
+            .distinctUntilChanged()
             .collect { scrolling ->
                 if (scrolling) viewModel.onInteracted()
             }
     }
 
-    val scale by animateFloatAsState(
-        targetValue = if (viewModel.hasInteracted) 1f else 0.6f,
-        animationSpec = tween(300),
-        label = "size"
-    )
-
     LaunchedEffect(Unit) {
-        delay(100)
-        viewModel.onInteracted()
-        delay(200)
-        viewModel.onContended()
+        viewModel.initState()
     }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -117,7 +111,6 @@ fun OpenningScreen(
             )
         }
         ContinueButton(
-            scale = scale,
             hasInteracted = viewModel.hasInteracted,
             goToRegister = goToRegister,
             modifier = Modifier
@@ -126,3 +119,4 @@ fun OpenningScreen(
         )
     }
 }
+

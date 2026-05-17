@@ -38,13 +38,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.domain)
 
-    implementation(projects.core.network)
-    implementation(projects.core.data)
     implementation(projects.core.datastore)
-
-
-
     implementation(projects.core.designsystem)
 
     implementation(libs.androidx.core.ktx)

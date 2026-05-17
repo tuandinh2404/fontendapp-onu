@@ -2,7 +2,7 @@ package com.example.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class User(
+data class UserResponse(
     val id: Int,
     val username: String,
 

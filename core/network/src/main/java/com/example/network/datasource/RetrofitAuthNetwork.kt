@@ -11,9 +11,8 @@ import javax.inject.Singleton
 
 @Singleton
 class RetrofitAuthNetwork @Inject constructor(
-    retrofit: Retrofit
+    private val api: AuthApi
 ): AuthNetworkDataSource {
-    private val api = retrofit.create(AuthApi::class.java)
 
     override suspend fun signUp(request: SignupRequest): AuthResponse {
         return api.signup(request)

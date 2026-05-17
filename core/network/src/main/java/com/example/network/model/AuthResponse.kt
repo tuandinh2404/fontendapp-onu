@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 
 data class AuthResponse(
-    val user: User,
+    val user: UserResponse,
     val token: String,
     val refreshToken: String
 )

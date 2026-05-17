@@ -22,4 +22,9 @@ class OpenningViewModel: ViewModel() {
     fun onMonthChanged(month: Int) { selectedMonth = month }
     fun onInteracted() { hasInteracted = true }
     fun onContended() { hasContended = true }
+
+    fun initState() {
+        hasInteracted = true
+        hasContended = true
+    }
 }

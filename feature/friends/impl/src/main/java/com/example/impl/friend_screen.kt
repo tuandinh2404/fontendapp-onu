@@ -45,12 +45,6 @@ fun friend_screen(
     val state = rememberLazyListState()
     var text by remember { mutableStateOf("") }
     var isFocused by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    var offsetY by remember { mutableFloatStateOf(0f) }
-    var hasNavigated by remember { mutableStateOf(false) }
-    val maxDrag = 300f
-    val progress = (offsetY / maxDrag).coerceIn(0f, 1f)
-    val haptic = LocalHapticFeedback.current
 
 
     Box(
@@ -71,11 +65,6 @@ fun friend_screen(
         friend_topbar(
             modifier = Modifier
                 .align(Alignment.TopCenter),
-            progress = { progress },
-            onOpen = {
-                offsetY = 0f
-                hasNavigated = false
-            }
         )
 
 

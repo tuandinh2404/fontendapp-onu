@@ -11,11 +11,13 @@ import com.example.network.datasource.AuthNetworkDataSource
 import com.example.network.datasource.RetrofitAuthNetwork
 import com.example.network.interceptor.AuthInterceptor
 import com.example.network.retrofit.AuthApi
+import com.example.network.retrofit.WeatherApi
 import dagger.Binds
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,9 +48,15 @@ abstract class NetworkModule {
                 .build()
 
         }
+
+        // =========================================================
+        // MAIN RETROFIT
+        // =========================================================
+
         @Provides
         @Singleton
-        fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        @Named("main_retrofit")
+        fun provideMainRetrofit(okHttpClient: OkHttpClient): Retrofit {
             return Retrofit.Builder()
                 .baseUrl(BuildConfig.BACKEND_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -56,10 +64,66 @@ abstract class NetworkModule {
                 .build()
         }
 
+        // =========================================================
+        // WEATHER RETROFIT
+        // =========================================================
+
         @Provides
         @Singleton
-        fun provideAuthApi(retrofit: Retrofit): AuthApi {
+        @Named("weather_retrofit")
+        fun provideWeatherRetrofit(
+            okHttpClient: OkHttpClient
+        ): Retrofit {
+
+            return Retrofit.Builder()
+                .baseUrl(
+                    "https://api.openweathermap.org/data/2.5/"
+                )
+                .addConverterFactory(
+                    GsonConverterFactory.create()
+                )
+                .client(okHttpClient)
+                .build()
+        }
+
+        // =========================================================
+        // AUTH API
+        // =========================================================
+        @Provides
+        @Singleton
+        fun provideAuthApi(
+            @Named("main_retrofit")
+            retrofit: Retrofit
+        ): AuthApi {
             return retrofit.create(AuthApi::class.java)
         }
+
+
+        // =========================================================
+        // WEATHER API
+        // =========================================================
+
+        @Provides
+        @Singleton
+        fun provideWeatherApi(
+            @Named("weather_retrofit")
+            retrofit: Retrofit
+        ): WeatherApi {
+            return retrofit.create(
+                WeatherApi::class.java
+            )
+        }
+
+        // =========================================================
+        // WEATHER API KEY
+        // =========================================================
+
+        @Provides
+        @Named("weather_api_key")
+        fun provideWeatherApiKey(): String {
+
+            return BuildConfig.WEATHER_API_KEY
+        }
+
     }
 }

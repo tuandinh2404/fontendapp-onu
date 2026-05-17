@@ -1,6 +1,8 @@
 package com.example.onu.router
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -24,55 +26,37 @@ fun NavigationBuilder(
 ) {
     val builderController = rememberNavController()
 
-
-    SharedTransitionLayout(
+    NavHost(
+        navController = builderController,
+        startDestination = NavigationBuilder_Router.main_router.route,
+        modifier = Modifier
+            .background(Color.Black)
     ) {
-        NavHost(
-            navController = builderController,
-            startDestination = NavigationBuilder_Router.main_router.route,
-            modifier = Modifier
-                .background(Color.Black)
-        ) {
-            composable(NavigationBuilder_Router.main_router.route) {
-                Main(
-                    builderController,
-                )
-            }
-            composable(
-                NavigationBuilder_Router.messenger_detail.route,
-                enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(300)
-                    )
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(300)
-
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(300)
-
-                    )
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(300)
-
-                    )
-                },
-            ) {
-                messenger_detail(builderController)
-            }
-
-
+        composable(NavigationBuilder_Router.main_router.route) {
+            Main(
+                builderController,
+            )
         }
+        composable(
+            NavigationBuilder_Router.messenger_detail.route,
+            enterTransition = {
+                EnterTransition.None
+            },
+            exitTransition = {
+                ExitTransition.None
+            },
+            popEnterTransition = {
+                EnterTransition.None
+
+            },
+            popExitTransition = {
+                ExitTransition.None
+            }
+        ) {
+            messenger_detail(builderController)
+        }
+
+
     }
 }
 

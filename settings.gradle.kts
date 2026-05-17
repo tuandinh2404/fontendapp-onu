@@ -33,6 +33,7 @@ include(":core:datastore")
 include(":core:common")
 include(":core:ui")
 include(":core:database")
+include(":core:media")
 
 include(":feature:moments:impl")
 include(":feature:moments:api")

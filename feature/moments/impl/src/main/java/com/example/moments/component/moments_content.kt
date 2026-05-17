@@ -11,15 +11,17 @@ fun moments_content(
     isCaptured: Boolean,
     onCapture: (Float) -> Unit,
     onPhotoTaken: (Bitmap) -> Unit,
-    isHomeActive: Boolean
+    isHomeActive: Boolean,
+    onOpenBottomSheet: () -> Unit,
 ) {
-    moments_pager(
+    CameraPage(
         mainController = mainController,
         builderController = builderController,
         isCaptured = isCaptured,
         onCapture = onCapture,
         onPhotoTaken = onPhotoTaken,
-        isHomeActive = isHomeActive
+        isHomeActive = isHomeActive,
+        onOpenBottomSheet = onOpenBottomSheet,
     )
 
 }

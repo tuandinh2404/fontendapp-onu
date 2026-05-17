@@ -1,28 +1,18 @@
 package com.example.impl.register
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.repository.AuthRepository
-import com.example.network.model.SignupRequest
+import com.example.domain.model.SignupParams
+import com.example.domain.repository.AuthRepository
+import com.example.domain.usecase.CheckUsernameUseCase
+import com.example.domain.usecase.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed class RegisterUiState {
-    object Idle : RegisterUiState()
-    object Loading : RegisterUiState()
-    object Success : RegisterUiState()
-    data class Error(val message: String): RegisterUiState()
-}
 
 data class RegisterFormState(
     val username: String = "",
@@ -46,7 +36,8 @@ fun SignupStep.getStepNumber(): Int {
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val signUpUseCase: SignUpUseCase,
+    private val checkUsernameUseCase: CheckUsernameUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
@@ -62,7 +53,7 @@ class RegisterViewModel @Inject constructor(
         val username = _formState.value.username
         viewModelScope.launch {
             _uiState.value = RegisterUiState.Loading
-            authRepository.signUp(SignupRequest(username, password, fullName, uid))
+            signUpUseCase(SignupParams(username, password, fullName, uid))
                 .onSuccess { success ->
                     Log.d("RegisterViewModel", "Đăng ký thành công:\n token=${success.token}")
                     _uiState.value = RegisterUiState.Success
@@ -75,15 +66,9 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun checkUsername(username: String) {
-        val usernameRegex = Regex("^[a-zA-Z0-9_]{6,20}$")
-        if (!usernameRegex.matches(username)) {
-            _uiState.value = RegisterUiState.Error("Tên đăng kí không hợp lệ")
-            return
-        }
         viewModelScope.launch {
             _uiState.value = RegisterUiState.Loading
-            delay(1000)
-            authRepository.checkUsername(username)
+            checkUsernameUseCase(username)
                 .onSuccess { response  ->
                     if (response.exists) {
                         _uiState.value = RegisterUiState.Error("Người dùng đã tồn tại")

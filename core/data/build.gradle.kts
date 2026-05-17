@@ -40,6 +40,10 @@ dependencies {
     api(projects.core.common)
     api(projects.core.model)
     api(projects.core.network)
+    api(projects.core.domain)
+    api(projects.core.datastore)
+
+
 
 
 

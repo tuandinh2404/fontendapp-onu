@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,28 +25,44 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
+import com.example.ui.permission.OnuPermission
+import com.example.ui.permission.rememberPermissionState
 
 @Composable
 fun camera_controls(
     builderController: NavHostController,
+    textureViewRef: () -> Unit,
     context: Context,
-    controller: camera_controller,
+    controller: CameraController,
+    zoomRatio: Float,
     isCaptured: Boolean,
     onCapture: (Float) -> Unit,
-    onPhotoTaken: (Bitmap) -> Unit
+    onPhotoTaken: (Bitmap) -> Unit,
+    onOpenBottomSheet: () -> Unit,
+    onHoldStart: () -> Unit,
+    onHoldEnd: () -> Unit
 ) {
     var rotation by remember { mutableStateOf(0f) }
+    var isPressed by remember { mutableStateOf(false) }
+
 
     val animatedRotation by animateFloatAsState(
         targetValue = rotation,
         label = ""
     )
+    val scale by animateFloatAsState(
+        targetValue = if(isPressed) 0.8f else 1f
+    )
+    val mediaPermission = rememberPermissionState(OnuPermission.MEDIA_IMAGES)
+
 
     Row(
         Modifier
@@ -56,12 +73,23 @@ fun camera_controls(
     ) {
         Box(
             Modifier
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
+                .scale(scale)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            isPressed = true
+                            val released = tryAwaitRelease()
+                            isPressed = false
+                            if (released) {
+                                if (mediaPermission.isGranted) {
+                                    onOpenBottomSheet()
+                                } else {
+                                    mediaPermission.request()
+                                }
+                            }
+                        },
+                    )
                 }
-
         ) {
             Box(
                 Modifier
@@ -93,7 +121,10 @@ fun camera_controls(
             context = context,
             isCaptured = isCaptured,
             onCapture = onCapture,
-            onPhotoTaken = onPhotoTaken
+            onPhotoTaken = onPhotoTaken,
+            zoomRatio = zoomRatio,
+            onHoldStart = onHoldStart,
+            onHoldEnd = onHoldEnd
         )
         Box(
             Modifier
@@ -112,7 +143,7 @@ fun camera_controls(
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         rotation += 180f
-                        controller.flipCamera()
+                        textureViewRef()
                     }
             )
         }

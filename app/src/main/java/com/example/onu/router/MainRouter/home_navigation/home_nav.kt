@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.example.moments.list.moments_screen
 import kotlinx.coroutines.launch
-import com.example.impl.messenger_screen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -32,9 +31,6 @@ fun home_nav(
     onPhotoTaken: (Bitmap) -> Unit,
     isHomeActive: Boolean
     ) {
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
     moments_screen(
         mainController = mainController,
         builderController = builderController,

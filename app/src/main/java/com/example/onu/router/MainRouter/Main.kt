@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.designsystem.icon.OnuIcons
@@ -73,7 +74,7 @@ private data class MainUIState(
 @Composable
 fun Main(
     builderController: NavHostController,
-    viewModel: CameraViewModel = viewModel(),
+    viewModel: CameraViewModel = hiltViewModel(),
 
     ) {
     val mainController = rememberNavController()
@@ -200,7 +201,8 @@ fun Main(
                 viewModel.closePreview()
             }
             moments_preview(
-                viewModel = viewModel
+                viewModel = viewModel,
+                onFetchLocation = { viewModel.fetchCurrentLocation() }
             )
         }
     }

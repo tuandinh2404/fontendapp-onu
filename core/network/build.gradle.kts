@@ -54,20 +54,49 @@ dependencies {
     kapt(libs.hilt.compiler)
 }
 
-val backendUrl: Provider<String> =  providers
-    .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
+
+// =========================================================
+// LOCAL.PROPERTIES
+// =========================================================
+
+val localProperties = providers
+    .fileContents(
+        rootProject.layout.projectDirectory.file("local.properties"))
     .asText
     .map { text ->
-    val properties = Properties().apply { load(StringReader(text)) }
-    properties.getProperty("BACKEND_URL", "http://example.com")
+        Properties().apply { load(StringReader(text)) }
+    }
+
+val backendUrl = localProperties.map {
+    it.getProperty(
+        "BACKEND_URL",
+        "http://example.com"
+    )
 }
-    .orElse("http://example.com")
+
+val weatherApiKey = localProperties.map {
+    it.getProperty(
+        "WEATHER_API_KEY",
+        ""
+    )
+}
 
 androidComponents {
     onVariants { variant ->
         variant.buildConfigFields?.put(
             "BACKEND_URL",
             backendUrl.map { value ->
+                BuildConfigField(
+                    type = "String",
+                    value = "\"$value\"",
+                    comment = null
+                )
+            }
+        )
+
+        variant.buildConfigFields?.put(
+            "WEATHER_API_KEY",
+            weatherApiKey.map { value ->
                 BuildConfigField(
                     type = "String",
                     value = "\"$value\"",

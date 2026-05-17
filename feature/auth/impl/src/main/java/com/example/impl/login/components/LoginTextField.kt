@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.designsystem.icon.OnuIcons
@@ -27,39 +28,31 @@ import com.example.designsystem.theme.LightGray
 fun LoginTextField(
     valueText: String,
     onChange: (String) -> Unit,
-    placeholder: String = "",
+    modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
+    textStyle: TextStyle,
     clearError: () -> Unit,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     isError: Boolean,
     enabled: Boolean = true
 ) {
     TextField(
         value = valueText,
         onValueChange = onChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
+        modifier = modifier
             .focusRequester(focusRequester),
-        placeholder = {
-            Text(
-                text = "Tên đăng nhập",
-                fontSize = 25.sp,
-                color = Color.Gray
-            )
-        },
-        textStyle = TextStyle(
-            fontSize = 25.sp,
-            color = LightGray,
-            fontWeight = FontWeight.ExtraBold
-        ),
+        placeholder = placeholder,
+        textStyle = textStyle,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
         singleLine = true,
         enabled = enabled,
         colors = TextFieldDefaults.colors(

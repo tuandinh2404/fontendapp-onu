@@ -16,10 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +39,8 @@ import com.example.impl.register.components.CustomStepProgress
 import com.example.impl.register.components.RegisterContent
 import com.example.impl.register.components.StepTextField
 import com.example.impl.register.components.TopBar
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -48,6 +52,10 @@ fun RegisterScreen(
 ) {
     val formState by viewModel.formState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(
         Modifier
@@ -61,7 +69,11 @@ fun RegisterScreen(
             TopBar(
                 goBack = {
                     if(formState.step == SignupStep.USERNAME) {
-                        goBack()
+                        scope.launch {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            goBack()
+                        }
                     } else {
                         viewModel.goBack()
                     }
@@ -79,7 +91,9 @@ fun RegisterScreen(
                 onCheckUsername = { viewModel.checkUsername(it) },
                 onNextStep = { viewModel.nextStep(it) },
                 onSignUp = { password, fullName, uid ->
-                    viewModel.signUp(password, fullName, uid) },
+                    viewModel.signUp(password, fullName, uid)
+                    goBack()
+                },
                 onClearError = { viewModel.clearError() }
             )
         }

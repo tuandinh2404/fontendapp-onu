@@ -51,6 +51,7 @@ import com.example.impl.login.components.LoginButton
 import com.example.impl.login.components.LoginContent
 import com.example.impl.login.components.LoginTextField
 import com.example.impl.login.components.TopBar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,11 +69,14 @@ fun LoginScreen(
     var textPassword by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val usernameFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val goMain = {
         scope.launch {
             focusManager.clearFocus()
             keyboardController?.hide()
+            delay(300)
             goToMain()
         }
     }
@@ -86,11 +90,16 @@ fun LoginScreen(
         }
     }
 
-    val enabledButton = if (!showPassword) {
+    val enabled = if (!showPassword) {
         textUsername.isNotEmpty() && textUsername.length >= 6
     } else {
         textPassword.isNotEmpty()
     }
+
+    val enabledButton by remember(textUsername, textPassword, showPassword) {
+        mutableStateOf(enabled)
+    }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -131,16 +140,17 @@ fun LoginScreen(
                     }
                 },
                 showPassword = showPassword,
+                usernameFocusRequester = usernameFocusRequester,
+                passwordFocusRequester = passwordFocusRequester
             )
-
         }
         LoginButton(
             modifier = Modifier
                 .align(Alignment.BottomCenter),
-            text = enabledButton,
+            enable = enabledButton,
             isLoading = uiState is LoginUiState.CheckingUsername || uiState is LoginUiState.LoggingIn,
             onClick = {
-                if(!showPassword) {
+                if (!showPassword) {
                     viewModel.checkUsername(textUsername)
                 } else {
                     viewModel.login(textUsername, textPassword)
@@ -148,4 +158,5 @@ fun LoginScreen(
             },
         )
     }
+
 }

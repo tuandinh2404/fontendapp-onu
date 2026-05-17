@@ -7,12 +7,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.datastore.session.SessionManager
 import com.example.designsystem.theme.DarkGray
 import com.example.impl.login.LoginScreen
 import com.example.impl.openning.OpenningScreen
@@ -31,28 +35,50 @@ sealed class Auth_Router(
 
 @Composable
 fun AuthRouter(
+    sessionManager: SessionManager
 ) {
     val navController = rememberNavController()
 
+    val startDestination by produceState(initialValue = "") {
+        value = if(sessionManager.getToken() != null)
+            Auth_Router.NavigationBuilder.route
+        else
+            Auth_Router.OpenningScreen.route
+    }
+    if (startDestination.isEmpty()) return
+
     NavHost(
         navController = navController,
-        startDestination = Auth_Router.OpenningScreen.route,
-        modifier = Modifier
+        startDestination = startDestination,
+        modifier =
+            Modifier
             .fillMaxSize()
             .background(DarkGray)
     ) {
         composable(Auth_Router.OpenningScreen.route,
             enterTransition = {
-                EnterTransition.None
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
+                )
             },
             exitTransition = {
-                ExitTransition.None
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
+                )
             },
             popEnterTransition = {
-                EnterTransition.None
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
+                )
             },
             popExitTransition = {
-                ExitTransition.None
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
+                )
             }
         ) {
             OpenningScreen(
@@ -74,29 +100,26 @@ fun AuthRouter(
         composable(Auth_Router.LoginScreen.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(300)
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
                 )
             },
             popEnterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
                 )
             },
             popExitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
                 )
             }
         ) {
@@ -118,29 +141,26 @@ fun AuthRouter(
         composable(Auth_Router.RegisterScreen.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(300)
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(450)
                 )
             },
             popEnterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
                 )
             },
             popExitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End,
-                    tween(300)
-
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(450)
                 )
             }
         ) {

@@ -45,7 +45,6 @@ import com.example.impl.openning.OpenningViewModel
 
 @Composable
 fun ContinueButton(
-    scale: Float,
     hasInteracted: Boolean,
     goToRegister: () -> Unit,
     modifier: Modifier = Modifier

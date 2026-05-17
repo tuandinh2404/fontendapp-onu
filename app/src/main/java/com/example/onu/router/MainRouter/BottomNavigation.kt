@@ -41,9 +41,9 @@ private data class NavItem(
 )
 
 private val navItems = listOf(
-    NavItem(MainTab.Home, OnuIcons.HomeFill, OnuIcons.HomeBold),
+    NavItem(MainTab.Notification, OnuIcons.User, OnuIcons.User),
+    NavItem(MainTab.Home, OnuIcons.Camera, OnuIcons.Camera),
     NavItem(MainTab.Friend, OnuIcons.Friends, OnuIcons.Friends),
-    NavItem(MainTab.Notification, OnuIcons.Notification, OnuIcons.Notification)
 )
 
 @Composable
@@ -62,30 +62,10 @@ fun BottomNavigation(
             .height(80.dp),
         contentAlignment = Alignment.Center
     ) {
-//        Box(
-//            Modifier
-//                .weight(0.8f)
-//                .fillMaxHeight(),
-//            contentAlignment = Alignment.Center
-//
-//        ) {
-//            Box(
-//                Modifier
-//                    .size(30.dp)
-//                    .clickable(
-//                    ) {
-//                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-//
-//                        openBottomSheet()
-//                    }
-//                    .background(Color.Blue, CircleShape)
-//
-//            )
-//        }
         Row(
             Modifier
-                .fillMaxWidth(0.7f)
-                .height(60.dp)
+                .fillMaxWidth(0.4f)
+                .height(40.dp)
                 .dropShadow(
                     shape = CircleShape,
                     shadow = Shadow(
@@ -131,7 +111,7 @@ fun BottomNavigation(
                             } else {
                                 item.iconInactive
                             },
-                            sizeIcon = 30,
+                            sizeIcon = 23,
                             colorIcon = if (isActive) {
                                 LightGray
                             } else {
@@ -143,29 +123,5 @@ fun BottomNavigation(
                 }
             }
         }
-        val profileInteraction = remember { MutableInteractionSource() }
-
-//        Box(
-//            Modifier
-//                .weight(0.8f)
-//                .fillMaxHeight()
-//                .clickable(
-//                    indication = null,
-//                    interactionSource = profileInteraction
-//                ) {
-//                    haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-//
-//                    openBottomSheet()
-//                },
-//            contentAlignment = Alignment.Center
-//
-//        ) {
-//            Box(
-//                Modifier
-//                    .size(30.dp)
-//                    .background(Color.Blue, CircleShape)
-//
-//            )
-//        }
     }
 }
