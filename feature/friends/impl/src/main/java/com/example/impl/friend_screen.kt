@@ -39,7 +39,7 @@ import com.example.ui.customOverScroll
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun friend_screen(
-
+    isScrollEnabled: Boolean = true
 ) {
     val focus = LocalFocusManager.current
     val state = rememberLazyListState()
@@ -60,7 +60,8 @@ fun friend_screen(
             text = text,
             isFocused = isFocused,
             onTextChange = { text = it },
-            onFocusChange = { isFocused = it }
+            onFocusChange = { isFocused = it },
+            isScrollEnabled = isScrollEnabled
         )
         friend_topbar(
             modifier = Modifier
@@ -78,7 +79,8 @@ fun FriendsListContent(
     text: String,
     isFocused: Boolean,
     onTextChange: (String) -> Unit,
-    onFocusChange: (Boolean) -> Unit
+    onFocusChange: (Boolean) -> Unit,
+    isScrollEnabled: Boolean
 ) {
     var overScrollOffset by remember { mutableFloatStateOf(0f) }
     LazyColumn(
@@ -95,6 +97,7 @@ fun FriendsListContent(
             )
         ,
         state = state,
+        userScrollEnabled = isScrollEnabled,
         contentPadding = PaddingValues(
             top = 110.dp,
             bottom = 70.dp

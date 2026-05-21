@@ -33,11 +33,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
+import com.example.moments.camera.controller.CameraController
 import com.example.ui.permission.OnuPermission
 import com.example.ui.permission.rememberPermissionState
 
 @Composable
-fun camera_controls(
+fun CameraControls(
     builderController: NavHostController,
     textureViewRef: () -> Unit,
     context: Context,
@@ -48,7 +49,7 @@ fun camera_controls(
     onPhotoTaken: (Bitmap) -> Unit,
     onOpenBottomSheet: () -> Unit,
     onHoldStart: () -> Unit,
-    onHoldEnd: () -> Unit
+    onHoldEnd: () -> Unit,
 ) {
     var rotation by remember { mutableStateOf(0f) }
     var isPressed by remember { mutableStateOf(false) }
@@ -116,7 +117,7 @@ fun camera_controls(
 
             )
         }
-        camera_shutter(
+        CameraShutter(
             controller = controller,
             context = context,
             isCaptured = isCaptured,
@@ -124,7 +125,7 @@ fun camera_controls(
             onPhotoTaken = onPhotoTaken,
             zoomRatio = zoomRatio,
             onHoldStart = onHoldStart,
-            onHoldEnd = onHoldEnd
+            onHoldEnd = onHoldEnd,
         )
         Box(
             Modifier

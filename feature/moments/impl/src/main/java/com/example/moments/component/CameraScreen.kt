@@ -1,9 +1,9 @@
 package com.example.moments.component
 
-import android.graphics.Paint
+import android.hardware.lights.Light
 import android.view.TextureView
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -16,42 +16,39 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.designsystem.icon.OnuIcons
 import com.example.designsystem.theme.DarkGray
+import com.example.designsystem.theme.JosefinSansFontFamily
 import com.example.designsystem.theme.LightGray
-import com.example.moments.CameraViewModel
+import com.example.designsystem.theme.NunitoFontFamily
+import com.example.designsystem.theme.OswaldFontFamily
+import com.example.moments.camera.controller.CameraController
 
 
 @Composable
-fun camera_screen(
+fun CameraScreen(
     cameraController: CameraController,
     onTextureReady: (TextureView) -> Unit,
     flipCamera:() -> Unit,
     onZoomChanged: (Float) -> Unit,
     zoomRatio: Float,
     holdProgressProvider:() -> Float,
+    time: String
 ) {
 
     var isFlashCamera by remember { mutableStateOf(false) }
@@ -89,7 +86,7 @@ fun camera_screen(
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(0.95f)
+                    .fillMaxWidth(0.90f)
                     .pointerInput(maxZoom) {
                         detectTransformGestures { _, _, zoom, _ ->
                             val newZoom = (currentZoomRatio * zoom).coerceIn(1f, maxZoom)
@@ -106,6 +103,11 @@ fun camera_screen(
                     .aspectRatio(3f / 4f)
                     .clip(RoundedCornerShape(15.dp))
                     .background(DarkGray)
+                    .border(
+                        width = 2.dp,
+                        color = Color.Cyan,
+                        shape = RoundedCornerShape(15.dp)
+                    )
             ) {
                 CameraPreview(
                     modifier = Modifier
@@ -122,6 +124,21 @@ fun camera_screen(
                     zoomRatio = zoomRatio,
                     holdProgressProvider = holdProgressProvider
                 )
+                Box(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 40.dp)
+                ) {
+                    Text(
+                        text = time,
+                        color = LightGray,
+                        modifier = Modifier
+                            .rotate(90f),
+                        fontSize = 45.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontFamily = JosefinSansFontFamily
+                    )
+                }
             }
         }
     }
@@ -136,8 +153,8 @@ fun CameraControlsBar(
 ) {
     Box(
         Modifier
-            .fillMaxWidth(0.97f)
-            .fillMaxHeight(0.73f)
+            .fillMaxWidth(0.93f)
+            .fillMaxHeight(0.70f)
             .clip(RoundedCornerShape(15.dp))
             .background(DarkGray),
     ) {

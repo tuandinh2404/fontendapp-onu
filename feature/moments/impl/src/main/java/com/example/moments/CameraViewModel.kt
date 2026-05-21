@@ -1,26 +1,30 @@
 package com.example.moments
 
-import android.Manifest
 import android.app.Application
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Geocoder
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.common.coroutine.Dispatcher
+import com.example.common.coroutine.OnuDispatchers
 import com.example.domain.model.Weather
 import com.example.domain.usecase.GetWeatherUseCase
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
@@ -35,7 +39,8 @@ data class LocationInfo(
 @HiltViewModel
 class CameraViewModel @Inject constructor(
     private val context: Application,
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    @Dispatcher(OnuDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     var isOpenedPreview  by mutableStateOf(false)
@@ -52,6 +57,29 @@ class CameraViewModel @Inject constructor(
     var isProcessingCapture by mutableStateOf(false)
     private set
 
+
+
+    private val _currentTime = MutableStateFlow("")
+    val currentTime = _currentTime.asStateFlow()
+
+    init {
+        startClock()
+    }
+    private fun startClock() {
+        viewModelScope.launch {
+            val formatter = SimpleDateFormat(
+                "H:mm",
+                Locale.getDefault()
+            )
+            while (true) {
+                val currentTime = formatter.format(Date())
+                _currentTime.value = currentTime
+                delay(1000)
+            }
+        }
+    }
+
+
     private val _weather = MutableStateFlow<Weather?>(null)
     val weather = _weather.asStateFlow()
 
@@ -63,8 +91,8 @@ class CameraViewModel @Inject constructor(
 
 
     fun onPhotoTaken(bitmap: Bitmap) {
-        capturedBitmap = bitmap
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
+            capturedBitmap = bitmap
             delay(300)
             isProcessingCapture = false
             isCaptured = false
@@ -92,9 +120,8 @@ class CameraViewModel @Inject constructor(
     fun fetchCurrentLocation() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
-                Log.d("Location", "location: $location") // 👈 null hay có?
                 location?.let {
-                    viewModelScope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(ioDispatcher) {
                         _location.value =
                             getLocationInfo(
                                 it.latitude,
@@ -160,7 +187,7 @@ class CameraViewModel @Inject constructor(
 
 
     private fun fetchWeather(lat: Double, lon: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
 
             getWeatherUseCase(lat, lon)
                 .onSuccess {

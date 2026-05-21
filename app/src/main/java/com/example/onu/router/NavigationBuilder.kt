@@ -15,7 +15,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moments.detail.messenger_detail
 import com.example.onu.router.MainRouter.Main
 
 
@@ -37,26 +36,6 @@ fun NavigationBuilder(
                 builderController,
             )
         }
-        composable(
-            NavigationBuilder_Router.messenger_detail.route,
-            enterTransition = {
-                EnterTransition.None
-            },
-            exitTransition = {
-                ExitTransition.None
-            },
-            popEnterTransition = {
-                EnterTransition.None
-
-            },
-            popExitTransition = {
-                ExitTransition.None
-            }
-        ) {
-            messenger_detail(builderController)
-        }
-
-
     }
 }
 

@@ -30,9 +30,9 @@ abstract class NetworkModule {
     ): AuthNetworkDataSource
 
     companion object {
-
         @Provides
         @Singleton
+        @Named("auth_client")
         fun provideOkHttpClient(
             authInterceptor: AuthInterceptor
         ): OkHttpClient {
@@ -50,13 +50,34 @@ abstract class NetworkModule {
         }
 
         // =========================================================
-        // MAIN RETROFIT
+        // OKHTTP — không có AuthInterceptor, dùng cho API bên thứ 3
         // =========================================================
 
         @Provides
         @Singleton
+        @Named("public_client")
+        fun providePublicOkHttpClient(): OkHttpClient {
+            return OkHttpClient.Builder()
+                .addInterceptor(
+                    HttpLoggingInterceptor().apply {
+                        if (BuildConfig.DEBUG) setLevel(HttpLoggingInterceptor.Level.BODY)
+                    }
+                )
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build()
+        }
+
+        // =========================================================
+        // MAIN RETROFIT
+        // =========================================================
+        @Provides
+        @Singleton
         @Named("main_retrofit")
-        fun provideMainRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        fun provideMainRetrofit(
+            @Named("auth_client")
+            okHttpClient: OkHttpClient
+        ): Retrofit {
             return Retrofit.Builder()
                 .baseUrl(BuildConfig.BACKEND_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -72,6 +93,7 @@ abstract class NetworkModule {
         @Singleton
         @Named("weather_retrofit")
         fun provideWeatherRetrofit(
+            @Named("public_client")
             okHttpClient: OkHttpClient
         ): Retrofit {
 
@@ -121,7 +143,6 @@ abstract class NetworkModule {
         @Provides
         @Named("weather_api_key")
         fun provideWeatherApiKey(): String {
-
             return BuildConfig.WEATHER_API_KEY
         }
 

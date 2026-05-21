@@ -1,6 +1,6 @@
 package com.example.domain.model
 
 data class Weather(
-    val temp: Float,
+    val temp: Int,
     val type: String
 )

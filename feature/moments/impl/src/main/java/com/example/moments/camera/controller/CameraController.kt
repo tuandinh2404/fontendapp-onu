@@ -1,12 +1,10 @@
-package com.example.moments.component
+package com.example.moments.camera.controller
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
-import android.graphics.Matrix
-import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
@@ -17,9 +15,12 @@ import android.hardware.camera2.TotalCaptureResult
 import android.media.ImageReader
 import android.util.Log
 import android.util.Range
-import android.util.Size
 import android.view.Surface
 import android.view.TextureView
+import com.example.moments.camera.capture.CaptureProcessor
+import com.example.moments.camera.preview.PreviewSizeSelector
+import com.example.moments.camera.preview.PreviewTransform
+import com.example.moments.camera.utils.CameraLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -27,7 +28,7 @@ class CameraController(private val context: Context) {
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
     init {
-        logAllCameras()
+        CameraLogger.logAllCameras(cameraManager)
     }
 
     private var cameraDevice: CameraDevice? = null
@@ -40,9 +41,10 @@ class CameraController(private val context: Context) {
     private var backUltraWideCameraId: String? = null
     private var frontCameraId: String? = null
 
-    private val currentFacing get() = if (_isFrontCamera.value)
-        CameraCharacteristics.LENS_FACING_FRONT
-    else CameraCharacteristics.LENS_FACING_BACK
+    private val currentFacing
+        get() = if (_isFrontCamera.value)
+            CameraCharacteristics.LENS_FACING_FRONT
+        else CameraCharacteristics.LENS_FACING_BACK
 
 
     private val _isFrontCamera = MutableStateFlow(true)
@@ -50,7 +52,8 @@ class CameraController(private val context: Context) {
 
     private var isFlashOn = false
 
-    @Volatile private var isReleased = false
+    @Volatile
+    private var isReleased = false
 
     private fun getCameraId(facing: Int): String {
         return cameraManager.cameraIdList.first { id ->
@@ -63,14 +66,18 @@ class CameraController(private val context: Context) {
         return cameraManager.getCameraCharacteristics(cameraId)
             .get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
     }
-    
+
     @SuppressLint("MissingPermission")
     fun openCamera(textureView: TextureView) {
         isReleased = false
 
         val cameraId = getCameraId(currentFacing)
+        val characteristics =
+            cameraManager.getCameraCharacteristics(cameraId)
 
-        val previewSize = getPreviewSize()
+        val previewSize = PreviewSizeSelector.select(
+            characteristics
+        )
 
         Log.d(
             "CameraPreview",
@@ -91,63 +98,38 @@ class CameraController(private val context: Context) {
 
         previewSurface = surface
 
-        imageReader = ImageReader.newInstance(2448,3264, ImageFormat.JPEG, 1)
+        imageReader = ImageReader.newInstance(2448, 3264, ImageFormat.JPEG, 1)
 
-        cameraManager.openCamera(cameraId,
-            object: CameraDevice.StateCallback() {
-            override fun onOpened(camera: CameraDevice) {
-                if(isReleased) {
-                    camera.close()
-                    return
+        cameraManager.openCamera(
+            cameraId,
+            object : CameraDevice.StateCallback() {
+                override fun onOpened(camera: CameraDevice) {
+                    if (isReleased) {
+                        camera.close()
+                        return
+                    }
+                    cameraDevice = camera
+
+                    PreviewTransform.apply(
+                        textureView,
+                        previewSize
+                    )
+                    startPreview(surface, cameraId)
                 }
-                cameraDevice = camera
-                configureTransform(
-                    textureView,
-                    previewSize
-                )
-                startPreview(surface, cameraId)
-            }
 
-            override fun onDisconnected(camera: CameraDevice) {
-                camera.close()
-                cameraDevice = null
-            }
+                override fun onDisconnected(camera: CameraDevice) {
+                    camera.close()
+                    cameraDevice = null
+                }
 
-            override fun onError(camera: CameraDevice, p1: Int) {
-                camera.close()
-                cameraDevice = null
-            }
-        }, null)
-    }
-    private fun configureTransform(
-        textureView: TextureView,
-        previewSize: Size
-    ) {
-        val viewWidth = textureView.width.toFloat()   // 1080
-        val viewHeight = textureView.height.toFloat() // 1440
-        val centerX = viewWidth / 2f
-        val centerY = viewHeight / 2f
-
-        // Sau rotate 90°: buffer width↔height đổi chỗ
-        // buffer thật sau rotate: 2448 wide x 3264 tall
-        val bufferWidth = previewSize.height.toFloat()  // 2448
-        val bufferHeight = previewSize.width.toFloat()  // 3264
-
-        val scaleX = viewWidth / bufferWidth    // 1080/2448
-        val scaleY = viewHeight / bufferHeight  // 1440/3264
-
-        // Lấy scale lớn hơn để fill
-        val scale = maxOf(scaleX, scaleY)
-
-        val matrix = Matrix()
-        matrix.postScale(
-            scale / scaleY,  // compensate
-            scale / scaleX,
-            centerX,
-            centerY
+                override fun onError(camera: CameraDevice, p1: Int) {
+                    camera.close()
+                    cameraDevice = null
+                }
+            }, null
         )
-        textureView.setTransform(matrix)
     }
+
     private fun getSupportFpsRange(cameraId: String): Range<Int> {
         val characteristics = cameraManager.getCameraCharacteristics(cameraId)
         val fpsRanges = characteristics.get(
@@ -193,7 +175,7 @@ class CameraController(private val context: Context) {
                 listOf(surface, reader.surface),
                 object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
-                        if(isReleased) {
+                        if (isReleased) {
                             session.close()
                             return
                         }
@@ -216,6 +198,7 @@ class CameraController(private val context: Context) {
             Log.w("CameraController", "startPreview: camera already closed")
         }
     }
+
     fun capture(
         zoomRatio: Float = 1f,
         onFinal: (Bitmap?) -> Unit
@@ -228,45 +211,47 @@ class CameraController(private val context: Context) {
         val cameraId = getCameraId(currentFacing)
         val sensorOrientation = getSensorOrientation(cameraId)
 
-        reader.setOnImageAvailableListener({ r ->
-            val image = r.acquireLatestImage() ?: return@setOnImageAvailableListener
-            val buffer = image.planes[0].buffer
-            val bytes = ByteArray(buffer.remaining())
-            buffer.get(bytes)
-            val rawBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            image.close()
+        reader.setOnImageAvailableListener(
+            { r ->
+                val image = r.acquireLatestImage()
+                    ?: return@setOnImageAvailableListener
+                val buffer = image.planes[0].buffer
+                val bytes = ByteArray(buffer.remaining())
+                buffer.get(bytes)
+                val rawBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                image.close()
 
-            val matrix = Matrix().apply {
-                postRotate(sensorOrientation.toFloat())
-                if (_isFrontCamera.value) postScale(-1f, 1f)
+                // Crop zoom
+                val result =
+                    CaptureProcessor.process(
+                        rawBitmap = rawBitmap,
+                        sensorOrientation = sensorOrientation,
+                        isFrontCamera = _isFrontCamera.value,
+                        zoomRatio = zoomRatio
+                    )
+
+                onFinal(result)
+            }, null
+        )
+
+        val captureRequest =
+            camera.createCaptureRequest(
+                CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG
+            ).apply {
+                addTarget(reader.surface)
+                set(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest
+                        .CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                )
+                set(
+                    CaptureRequest.CONTROL_AE_MODE,
+                    if (isFlashOn)
+                        CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH
+                    else
+                        CaptureRequest.CONTROL_AE_MODE_ON
+                )
             }
-            val rotated = Bitmap.createBitmap(
-                rawBitmap, 0, 0,
-                rawBitmap.width, rawBitmap.height,
-                matrix, true
-            )
-
-            // Crop zoom
-            val result = if (zoomRatio <= 1f) rotated else {
-                val cropW = (rotated.width / zoomRatio).toInt()
-                val cropH = (rotated.height / zoomRatio).toInt()
-                val cropX = (rotated.width - cropW) / 2
-                val cropY = (rotated.height - cropH) / 2
-                Bitmap.createBitmap(rotated, cropX, cropY, cropW, cropH)
-            }
-
-            onFinal(result)
-        }, null)
-
-        val captureRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).apply {
-            addTarget(reader.surface)
-            set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-            set(
-                CaptureRequest.CONTROL_AE_MODE,
-                if (isFlashOn) CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH
-                else CaptureRequest.CONTROL_AE_MODE_ON
-            )
-        }
 
         try {
             session.capture(
@@ -279,7 +264,9 @@ class CameraController(private val context: Context) {
                     ) {
                         // Restart preview sau khi chụp
                         if (!isReleased) {
-                            previewSurface?.let { startPreview(it, cameraId) }
+                            previewSurface?.let {
+                                startPreview(it, cameraId)
+                            }
                         }
                     }
                 },
@@ -325,34 +312,4 @@ class CameraController(private val context: Context) {
         return cameraManager.getCameraCharacteristics(cameraId)
             .get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM) ?: 4f
     }
-
-    fun logAllCameras() {
-        for (id in cameraManager.cameraIdList) {
-            val characteristics = cameraManager.getCameraCharacteristics(id)
-            val facing = characteristics.get(CameraCharacteristics.LENS_FACING)
-            val focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)
-            val maxZoom = characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM)
-            Log.d("CameraInfo", "ID: $id | facing: $facing | focal: ${focalLengths?.toList()} | maxZoom: $maxZoom")
-        }
-    }
-
-    fun getPreviewSize(): android.util.Size {
-        val cameraId = getCameraId(currentFacing)
-        val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-        val streamMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-
-        // Lấy preview size phù hợp với view 3:4
-        val sizes = streamMap?.getOutputSizes(SurfaceTexture::class.java) ?: return android.util.Size(1080, 1440)
-
-        return sizes
-            .filter {
-                kotlin.math.abs(
-                    (it.width.toFloat() / it.height.toFloat()) - (4f / 3f)
-                ) < 0.01f
-            }
-            .filter { it.width <= 1920 }
-            .maxByOrNull { it.width * it.height }
-            ?: android.util.Size(1080, 1440)
-    }
-
 }

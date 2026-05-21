@@ -24,4 +24,6 @@ object OnuIcons {
     val ArrowRight = R.drawable.arrow_right
 
     val Star = R.drawable.star_alt
+
+    val Location = R.drawable.location
 }

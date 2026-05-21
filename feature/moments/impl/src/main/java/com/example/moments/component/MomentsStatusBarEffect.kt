@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowInsetsControllerCompat
 
 @Composable
-fun moments_statusbar_effect(
+fun MomentsStatusBarEffect(
     darkIcons: Boolean = false
 ) {
     val view = LocalView.current

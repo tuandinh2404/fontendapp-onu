@@ -29,9 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.designsystem.theme.BlackAmoled
 import com.example.moments.CameraViewModel
+import com.example.moments.camera.controller.CameraController
 
 @Composable
-fun camera_shutter(
+fun CameraShutter(
     context: Context,
     controller: CameraController,
     isCaptured: Boolean,
@@ -40,7 +41,7 @@ fun camera_shutter(
     zoomRatio: Float,
     viewModel : CameraViewModel = hiltViewModel(),
     onHoldStart: () -> Unit,
-    onHoldEnd: () -> Unit
+    onHoldEnd: () -> Unit,
 ) {
     var isPressed by remember { mutableStateOf(false) }
     var isReleased by remember { mutableStateOf(false) }

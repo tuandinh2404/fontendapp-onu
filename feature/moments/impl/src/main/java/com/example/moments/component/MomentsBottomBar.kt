@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun moments_bottombar(
+fun MomentsBottombar(
     modifier: Modifier = Modifier,
     isGridMode: Boolean,
     builderController: NavHostController,
@@ -72,7 +72,7 @@ fun moments_bottombar(
                 )
             }
         }
-        button_moments(
+        ButtonMoments(
             builderController,
             onUpClick,
             isGridMode,

@@ -24,14 +24,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.designsystem.theme.BlackAmoled
 import com.example.designsystem.theme.LightGray
+import com.example.designsystem.theme.OswaldFontFamily
 import com.example.moments.CameraViewModel
+import com.example.moments.camera.controller.CameraController
 import com.example.ui.permission.OnuPermission
 import com.example.ui.permission.openAppSettings
 import com.example.ui.permission.rememberPermissionState
@@ -45,7 +47,8 @@ fun CameraPage(
     onPhotoTaken: (Bitmap) -> Unit,
     isHomeActive: Boolean,
     onOpenBottomSheet: () -> Unit,
-    viewModel: CameraViewModel = hiltViewModel()
+    viewModel: CameraViewModel = hiltViewModel(),
+    time: String,
 ) {
     val context = LocalContext.current
     val cameraPermission = rememberPermissionState(OnuPermission.CAMERA)
@@ -80,21 +83,23 @@ fun CameraPage(
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(60.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-            ) {
-                weather?.let {
-                    Text(
-                        text = "${it.temp}°C",
-                        color = LightGray,
-                        fontSize = 20.sp
-                    )
-                }
-
-            }
+//            Box(
+//            ) {
+//                weather?.let {
+//                    Text(
+//                        text = "${it.temp}°C",
+//                        color = LightGray,
+//                        fontSize = 20.sp,
+//                        fontWeight = FontWeight.ExtraBold,
+//                        fontFamily = OswaldFontFamily
+//                    )
+//                }
+//
+//            }
 
         }
         if(isHomeActive) {
@@ -105,13 +110,14 @@ fun CameraPage(
                     }
                 )
             } else {
-                camera_screen(
+                CameraScreen(
                     cameraController = cameraController,
                     onTextureReady   = { textureViewRef = it },
                     flipCamera = { textureViewRef?.let { cameraController.flipCamera(it) } },
                     onZoomChanged = { zoomRatio = it },
                     zoomRatio = zoomRatio,
                     holdProgressProvider = { holdProgress },
+                    time = time
                 )
             }
         } else {
@@ -123,7 +129,7 @@ fun CameraPage(
                     .background(BlackAmoled)
             )
         }
-        camera_controls(
+        CameraControls(
             builderController = builderController,
             textureViewRef = { textureViewRef?.let { cameraController.flipCamera(it) } },
             controller = cameraController,
@@ -134,7 +140,7 @@ fun CameraPage(
             onPhotoTaken = onPhotoTaken,
             onOpenBottomSheet = onOpenBottomSheet,
             onHoldStart = { isHolding = true },
-            onHoldEnd = { isHolding = false }
+            onHoldEnd = { isHolding = false },
         )
     }
 }

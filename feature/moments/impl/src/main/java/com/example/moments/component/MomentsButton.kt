@@ -30,7 +30,7 @@ import androidx.navigation.NavHostController
 import com.example.designsystem.icon.OnuIcons
 
 @Composable
-fun button_moments(
+fun ButtonMoments(
     builderController: NavHostController,
     onUpClick: () -> Unit,
     isGridMode: Boolean,
