@@ -5,6 +5,8 @@ import android.view.TextureView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -48,7 +50,6 @@ fun CameraScreen(
     onZoomChanged: (Float) -> Unit,
     zoomRatio: Float,
     holdProgressProvider:() -> Float,
-    time: String
 ) {
 
     var isFlashCamera by remember { mutableStateOf(false) }
@@ -56,6 +57,11 @@ fun CameraScreen(
     val maxZoom = remember(isFront) { cameraController.getMaxZoom() }
     var currentZoomIndex by remember { mutableStateOf(0) }
     val currentZoomRatio by rememberUpdatedState(zoomRatio)
+    val zoomLevels = if (isFront) {
+        listOf(1f, 2f, 3f, 4f).filter { it <= maxZoom }
+    } else {
+        listOf(1f, 2f, 3f, 4f, 5f).filter { it <= maxZoom }
+    }
 
 
 
@@ -72,12 +78,6 @@ fun CameraScreen(
             .fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
     ) {
-        CameraControlsBar(
-            cameraController = cameraController,
-            isFlashCamera = isFlashCamera,
-            flashCamera = { isFlashCamera = !isFlashCamera },
-            zoomRatio = zoomRatio
-        )
         Box(
             Modifier
                 .fillMaxWidth()
@@ -86,13 +86,7 @@ fun CameraScreen(
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(0.90f)
-                    .pointerInput(maxZoom) {
-                        detectTransformGestures { _, _, zoom, _ ->
-                            val newZoom = (currentZoomRatio * zoom).coerceIn(1f, maxZoom)
-                            onZoomChanged(newZoom)
-                        }
-                    }
+                    .fillMaxWidth(0.95f)
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = {
@@ -100,7 +94,7 @@ fun CameraScreen(
                             }
                         )
                     }
-                    .aspectRatio(3f / 4f)
+                    .aspectRatio(9f / 16f)
                     .clip(RoundedCornerShape(15.dp))
                     .background(DarkGray)
                     .border(
@@ -120,25 +114,45 @@ fun CameraScreen(
                         cameraController.release()
                     }
                 )
-                CropOverlay(
-                    zoomRatio = zoomRatio,
-                    holdProgressProvider = holdProgressProvider
-                )
                 Box(
                     Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 40.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 15.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = time,
-                        color = LightGray,
-                        modifier = Modifier
-                            .rotate(90f),
-                        fontSize = 45.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontFamily = JosefinSansFontFamily
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(40.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        zoomLevels.forEach { level ->
+                            val isSelected = (currentZoomRatio * 10).toInt() == (level * 10).toInt()
+                            Box(
+                                Modifier
+                                    .size(30.dp)
+                                    .clickable(
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() }
+                                    ) {
+                                        onZoomChanged(level)
+                                        cameraController.setZoom(level)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${level.toInt()}",
+                                    color = if (isSelected) Color.Cyan else LightGray,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
                 }
+//                CropOverlay(
+//                    zoomRatio = zoomRatio,
+//                    holdProgressProvider = holdProgressProvider
+//                )
             }
         }
     }

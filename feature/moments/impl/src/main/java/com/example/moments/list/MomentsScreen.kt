@@ -1,5 +1,6 @@
 package com.example.moments.list
 import android.graphics.Bitmap
+import android.view.TextureView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,6 +37,7 @@ fun MomentsScreen(
     onPhotoTaken: (Bitmap) -> Unit,
     isHomeActive: Boolean,
     viewModel: CameraViewModel = hiltViewModel(),
+    currentTab: Boolean
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember {
@@ -50,6 +52,8 @@ fun MomentsScreen(
         }
     }
 
+    MomentsStatusBarEffect(darkIcons = false)
+
     Box(
         Modifier
             .fillMaxSize()
@@ -62,7 +66,6 @@ fun MomentsScreen(
             )
 
         }
-        MomentsStatusBarEffect(darkIcons = true)
         CameraPage(
             mainController = mainController,
             builderController = builderController,
@@ -72,6 +75,7 @@ fun MomentsScreen(
             isHomeActive = isHomeActive,
             onOpenBottomSheet = { showBottomSheet = true },
             time = time,
+            currentTab = currentTab
         )
     }
 }

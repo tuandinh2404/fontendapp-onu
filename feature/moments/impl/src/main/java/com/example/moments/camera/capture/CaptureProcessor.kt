@@ -14,7 +14,7 @@ object CaptureProcessor {
         val matrix = Matrix().apply {
 
             postRotate(
-                sensorOrientation.toFloat()
+                sensorOrientation.toFloat() + 180f
             )
 
             if (isFrontCamera) {
@@ -31,32 +31,75 @@ object CaptureProcessor {
             matrix,
             true
         )
+        val cropped = cropToAspectRatio(
+            rotated,
+            16f / 9f
+        )
 
         return if (zoomRatio <= 1f) {
 
-            rotated
+            cropped
 
         } else {
 
             val cropWidth =
-                (rotated.width / zoomRatio).toInt()
+                (cropped.width / zoomRatio).toInt()
 
             val cropHeight =
-                (rotated.height / zoomRatio).toInt()
+                (cropped.height / zoomRatio).toInt()
 
             val cropX =
-                (rotated.width - cropWidth) / 2
+                (cropped.width - cropWidth) / 2
 
             val cropY =
-                (rotated.height - cropHeight) / 2
+                (cropped.height - cropHeight) / 2
 
             Bitmap.createBitmap(
-                rotated,
+                cropped,
                 cropX,
                 cropY,
                 cropWidth,
                 cropHeight
             )
         }
+    }
+
+    private fun cropToAspectRatio(
+        bitmap: Bitmap,
+        targetRatio: Float
+    ): Bitmap {
+
+        val currentRatio =
+            bitmap.width.toFloat() / bitmap.height.toFloat()
+
+        var newWidth = bitmap.width
+        var newHeight = bitmap.height
+
+        if (currentRatio > targetRatio) {
+
+            // quá rộng
+            newWidth =
+                (bitmap.height * targetRatio).toInt()
+
+        } else {
+
+            // quá cao
+            newHeight =
+                (bitmap.width / targetRatio).toInt()
+        }
+
+        val x =
+            (bitmap.width - newWidth) / 2
+
+        val y =
+            (bitmap.height - newHeight) / 2
+
+        return Bitmap.createBitmap(
+            bitmap,
+            x,
+            y,
+            newWidth,
+            newHeight
+        )
     }
 }

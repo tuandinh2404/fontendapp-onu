@@ -3,6 +3,7 @@ package com.example.moments.camera.preview
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.util.Size
+import kotlin.math.abs
 
 object PreviewSizeSelector {
     fun select(
@@ -11,16 +12,16 @@ object PreviewSizeSelector {
 
         val streamMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
 
-        val sizes = streamMap?.getOutputSizes(SurfaceTexture::class.java) ?: return android.util.Size(1080, 1440)
+        val sizes = streamMap?.getOutputSizes(SurfaceTexture::class.java) ?: return android.util.Size(1920, 1080)
 
         return sizes
             .filter {
-                kotlin.math.abs(
-                    (it.width.toFloat() / it.height.toFloat()) - (4f / 3f)
-                ) < 0.01f
+                val ratio = maxOf(it.width, it.height).toFloat() /
+                        minOf(it.width, it.height).toFloat()
+
+                abs(ratio - (16f / 9f)) < 0.01f
             }
-            .filter { it.width <= 1920 }
             .maxByOrNull { it.width * it.height }
-            ?: android.util.Size(1080, 1440)
+            ?: android.util.Size(1920, 1080)
     }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.ImageFormat
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCaptureSession
@@ -13,16 +14,19 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.TotalCaptureResult
 import android.media.ImageReader
+import android.os.Build
 import android.util.Log
 import android.util.Range
 import android.view.Surface
 import android.view.TextureView
 import com.example.moments.camera.capture.CaptureProcessor
+import com.example.moments.camera.preview.JpegSizeSelector
 import com.example.moments.camera.preview.PreviewSizeSelector
 import com.example.moments.camera.preview.PreviewTransform
 import com.example.moments.camera.utils.CameraLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.nio.ByteBuffer
 
 class CameraController(private val context: Context) {
     private val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -78,6 +82,9 @@ class CameraController(private val context: Context) {
         val previewSize = PreviewSizeSelector.select(
             characteristics
         )
+        val jpegSize = JpegSizeSelector.select(
+            characteristics
+        )
 
         Log.d(
             "CameraPreview",
@@ -98,7 +105,12 @@ class CameraController(private val context: Context) {
 
         previewSurface = surface
 
-        imageReader = ImageReader.newInstance(2448, 3264, ImageFormat.JPEG, 1)
+        imageReader = ImageReader.newInstance(
+            jpegSize.width,
+            jpegSize.height,
+            ImageFormat.JPEG,
+            1
+        )
 
         cameraManager.openCamera(
             cameraId,
@@ -158,14 +170,14 @@ class CameraController(private val context: Context) {
                 set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, getSupportFpsRange(cameraId))
                 set(
                     CaptureRequest.NOISE_REDUCTION_MODE,
-                    CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY
+                    CaptureRequest.NOISE_REDUCTION_MODE_FAST
                 )
-                set(CaptureRequest.EDGE_MODE, CaptureRequest.EDGE_MODE_HIGH_QUALITY)
-                set(CaptureRequest.SHADING_MODE, CaptureRequest.SHADING_MODE_HIGH_QUALITY)
-                set(CaptureRequest.HOT_PIXEL_MODE, CaptureRequest.HOT_PIXEL_MODE_HIGH_QUALITY)
+                set(CaptureRequest.EDGE_MODE, CaptureRequest.EDGE_MODE_FAST)
+                set(CaptureRequest.SHADING_MODE, CaptureRequest.SHADING_MODE_FAST)
+                set(CaptureRequest.HOT_PIXEL_MODE, CaptureRequest.HOT_PIXEL_MODE_FAST)
                 set(
                     CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE,
-                    CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY
+                    CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE_FAST
                 )
 
             }
@@ -213,12 +225,35 @@ class CameraController(private val context: Context) {
 
         reader.setOnImageAvailableListener(
             { r ->
+                r.setOnImageAvailableListener(null, null)
                 val image = r.acquireLatestImage()
                     ?: return@setOnImageAvailableListener
+                Log.d(
+                    "CaptureSize",
+                    "image = ${image.width} x ${image.height}"
+                )
+                Log.d("CaptureSize", "format = ${image.format}")
+                Log.d("CaptwareSize", "planes count = ${image.planes.size}")
+
+                val plane = image.planes[0]
+                Log.d("CaptureSize", "rowStride = ${plane.rowStride}")
+                Log.d("CaptureSize", "pixelStride = ${plane.pixelStride}")
+                Log.d("CaptureSize", "buffer capacity = ${plane.buffer.capacity()}")
+                Log.d("CaptureSize", "buffer remaining = ${plane.buffer.remaining()}")
                 val buffer = image.planes[0].buffer
                 val bytes = ByteArray(buffer.remaining())
+                Log.d(
+                    "CaptureSize",
+                    "bytes = ${bytes.size}"
+                )
                 buffer.get(bytes)
+
                 val rawBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+
+                Log.d(
+                    "CaptureSize",
+                    "rawBitmap = ${rawBitmap.width} x ${rawBitmap.height}"
+                )
                 image.close()
 
                 // Crop zoom
@@ -227,7 +262,7 @@ class CameraController(private val context: Context) {
                         rawBitmap = rawBitmap,
                         sensorOrientation = sensorOrientation,
                         isFrontCamera = _isFrontCamera.value,
-                        zoomRatio = zoomRatio
+                        zoomRatio = 1f
                     )
 
                 onFinal(result)
@@ -251,6 +286,19 @@ class CameraController(private val context: Context) {
                     else
                         CaptureRequest.CONTROL_AE_MODE_ON
                 )
+                set(CaptureRequest.JPEG_ORIENTATION, sensorOrientation)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    set(CaptureRequest.CONTROL_ZOOM_RATIO, zoomRatio)
+                } else {
+                    val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+                    val sensorRect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)!!
+                    val cropWidth = (sensorRect.width() / zoomRatio).toInt()
+                    val cropHeight = (sensorRect.height() / zoomRatio).toInt()
+                    val cropX = (sensorRect.width() - cropWidth) / 2
+                    val cropY = (sensorRect.height() - cropHeight) / 2
+                    set(CaptureRequest.SCALER_CROP_REGION, android.graphics.Rect(cropX, cropY, cropX + cropWidth, cropY + cropHeight))
+                }
             }
 
         try {
@@ -282,6 +330,36 @@ class CameraController(private val context: Context) {
     }
 
 
+    fun setZoom(zoomRatio: Float) {
+        val camera = cameraDevice ?: return
+        val session = captureSession ?: return
+        val cameraId = getCameraId(currentFacing)
+        val surface = previewSurface ?: return
+
+        try {
+            val previewRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
+                addTarget(surface)
+                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
+                set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, getSupportFpsRange(cameraId))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    set(CaptureRequest.CONTROL_ZOOM_RATIO, zoomRatio)
+                } else {
+                    // API < 30: dùng crop region
+                    val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+                    val sensorRect = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)!!
+                    val cropWidth = (sensorRect.width() / zoomRatio).toInt()
+                    val cropHeight = (sensorRect.height() / zoomRatio).toInt()
+                    val cropX = (sensorRect.width() - cropWidth) / 2
+                    val cropY = (sensorRect.height() - cropHeight) / 2
+                    set(CaptureRequest.SCALER_CROP_REGION, android.graphics.Rect(cropX, cropY, cropX + cropWidth, cropY + cropHeight))
+                }
+            }
+            session.setRepeatingRequest(previewRequest.build(), null, null)
+        } catch (e: Exception) {
+            Log.w("CameraController", "setZoom failed: ${e.message}")
+        }
+    }
     fun flipCamera(textureView: TextureView) {
         _isFrontCamera.value = !_isFrontCamera.value
         release()

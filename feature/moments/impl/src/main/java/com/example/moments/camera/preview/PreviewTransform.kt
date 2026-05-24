@@ -11,6 +11,7 @@ object PreviewTransform {
     ) {
         val viewWidth = textureView.width.toFloat()   // 1080
         val viewHeight = textureView.height.toFloat() // 1440
+
         val centerX = viewWidth / 2f
         val centerY = viewHeight / 2f
 
@@ -19,16 +20,20 @@ object PreviewTransform {
         val bufferWidth = previewSize.height.toFloat()  // 2448
         val bufferHeight = previewSize.width.toFloat()  // 3264
 
-        val scaleX = viewWidth / bufferWidth    // 1080/2448
-        val scaleY = viewHeight / bufferHeight  // 1440/3264
+        val scale = maxOf(
+            viewWidth / bufferWidth,
+            viewHeight / bufferHeight
+        )
+
+        val scaleX = bufferWidth * scale    // 1080/2448
+        val scaleY = bufferHeight * scale  // 1440/3264
 
         // Lấy scale lớn hơn để fill
-        val scale = maxOf(scaleX, scaleY)
 
         val matrix = Matrix()
         matrix.postScale(
-            scale / scaleY,  // compensate
-            scale / scaleX,
+            scaleX / viewWidth,
+            scaleY / viewHeight,
             centerX,
             centerY
         )

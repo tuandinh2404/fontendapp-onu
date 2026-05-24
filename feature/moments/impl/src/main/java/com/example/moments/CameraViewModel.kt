@@ -57,7 +57,16 @@ class CameraViewModel @Inject constructor(
     var isProcessingCapture by mutableStateOf(false)
     private set
 
+    var pendingCapture by mutableStateOf(false)
+        private set
 
+    fun requestCapture() {
+        pendingCapture = true
+    }
+
+    fun onCaptureHandled() {
+        pendingCapture = false
+    }
 
     private val _currentTime = MutableStateFlow("")
     val currentTime = _currentTime.asStateFlow()
@@ -66,7 +75,7 @@ class CameraViewModel @Inject constructor(
         startClock()
     }
     private fun startClock() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             val formatter = SimpleDateFormat(
                 "H:mm",
                 Locale.getDefault()

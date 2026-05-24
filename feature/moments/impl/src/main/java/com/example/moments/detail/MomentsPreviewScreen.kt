@@ -111,7 +111,8 @@ fun MomentsPreviewScreen(
 
             Box(
                 Modifier
-                    .fillMaxWidth(0.9f),
+                    .fillMaxWidth(0.99f)
+                    .clip(RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center
 
             ) {
@@ -124,7 +125,7 @@ fun MomentsPreviewScreen(
                             .build(),
                         contentDescription = "Captured Image",
                         modifier = Modifier
-                            .aspectRatio(3f / 4f),
+                            .aspectRatio(16f / 9f),
                         contentScale = ContentScale.Crop
                     )
                 }
